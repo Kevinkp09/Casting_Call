@@ -2,7 +2,7 @@ class Api::V1::UsersController < ApplicationController
     skip_before_action :doorkeeper_authorize!, only: %i[create]
 
     def create
-      user = User.new(email: user_params[:email], password: user_params[:password])
+      user = User.new(user_params)
 
       client_app = Doorkeeper::Application.find_by(uid: params[:client_id])
 
@@ -39,7 +39,7 @@ class Api::V1::UsersController < ApplicationController
     private
 
     def user_params
-      params.require(:user).permit(:email, :password)
+      params.require(:user).permit(:email, :password, :username, :mobile_no)
     end
 
     def generate_refresh_token
