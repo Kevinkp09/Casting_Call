@@ -33,3 +33,4 @@
 /config/master.key
 
 gemfile.lock
+/config/database.yml
