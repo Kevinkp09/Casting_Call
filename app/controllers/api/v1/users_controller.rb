@@ -3,9 +3,7 @@ class Api::V1::UsersController < ApplicationController
 
     def create
       user = User.new(user_params)
-
       client_app = Doorkeeper::Application.find_by(uid: params[:client_id])
-
       return render(json: { error: 'Invalid client ID'}, status: 403) unless client_app
 
       if user.save
@@ -21,6 +19,7 @@ class Api::V1::UsersController < ApplicationController
         # return json containing access token and refresh token
         # so that user won't need to call login API right after registration
         render(json: {
+          message: 'User created successfully',
           user: {
             id: user.id,
             email: user.email,
@@ -32,7 +31,7 @@ class Api::V1::UsersController < ApplicationController
           }
         })
       else
-        render(json: { error: user.errors.full_messages }, status: 422)
+        render(json: { error: 'Invalid user. Please check the provided information.', full_messages: user.errors.full_messages }, status: 422)
       end
     end
 
@@ -50,6 +49,7 @@ class Api::V1::UsersController < ApplicationController
         )
 
         render(json: {
+          message: 'User login successfully',
           user: {
             id: user.id,
             email: user.email,
@@ -61,14 +61,14 @@ class Api::V1::UsersController < ApplicationController
           }
         })
       else
-        render json: {error: "Invalid email or password"}, status: :unprocessable_entity
+        render json: {error: "Invalid email or password",full_messages: user.errors.full_messages }, status: :unprocessable_entity
       end
     end
 
     private
 
     def user_params
-      params.require(:user).permit(:email, :password, :username, :mobile_no)
+      params.require(:user).permit(:email, :password, :username, :mobile_no, :role)
     end
 
     def generate_refresh_token
