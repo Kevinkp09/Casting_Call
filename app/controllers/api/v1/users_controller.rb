@@ -1,5 +1,5 @@
 class Api::V1::UsersController < ApplicationController
-    skip_before_action :doorkeeper_authorize!, only: %i[create login]
+    skip_before_action :doorkeeper_authorize!, only: %i[create login show]
 
     def create
       user = User.new(user_params)
@@ -63,6 +63,31 @@ class Api::V1::UsersController < ApplicationController
       else
         render json: {error: "Invalid email or password",full_messages: user.errors.full_messages }, status: :unprocessable_entity
       end
+    end
+
+    def index
+      users = User.all
+        render json: {
+         users: users.map { |user|
+          {
+            id: user.id,
+            email: user.email,
+            username: user.username,
+            mobile_no: user.mobile_no,
+          }
+        }
+      }
+    end
+
+    def show
+      user = User.find(params[:id])
+      render json: {
+      user: {
+        email: user.email,
+        username: user.username,
+        mobile_no: user.mobile_no
+        }
+      }
     end
 
     private
