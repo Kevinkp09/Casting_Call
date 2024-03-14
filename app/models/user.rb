@@ -14,16 +14,4 @@ class User < ApplicationRecord
     user = User.find_for_authentication(email: email)
     user&.valid_password?(password) ? user : nil
   end
-
-  def artist?
-    current_user.role == "artist"
-  end
-
-  def agency?
-    current_user.role == "agency"
-  end
-
-  def super_admin?
-    current_user.role == "super_admin"
-  end
 end
