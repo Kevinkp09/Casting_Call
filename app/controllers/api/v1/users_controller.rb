@@ -1,5 +1,5 @@
 class Api::V1::UsersController < ApplicationController
-    skip_before_action :doorkeeper_authorize!, only: %i[create login show]
+    skip_before_action :doorkeeper_authorize!, only: %i[create login show add_details]
 
     def create
       user = User.new(user_params)
@@ -69,17 +69,28 @@ class Api::V1::UsersController < ApplicationController
       user = User.find(params[:id])
       render json: {
       user: {
-        email: user.email,
-        username: user.username,
-        mobile_no: user.mobile_no
+        gender: user.gender,
+        category: user.category,
+        birth_date: user.birth_date,
+        current_location: user.current_location,
+        profile_photo: user.profile_photo
         }
       }
     end
 
+  def add_details
+    user = User.find(params[:id])
+    if user.update(user_params)
+      render json: { message: 'User details updated successfully' }
+    else
+      render json: { error: user.errors.full_messages }, status: :unprocessable_entity
+    end
+  end
+
     private
 
     def user_params
-      params.require(:user).permit(:email, :password, :username, :mobile_no, :role)
+      params.require(:user).permit(:email, :password, :username, :mobile_no, :role, :gender, :category, :birth_date, :current_location, :profile_photo, :audition_posts)
     end
 
     def generate_refresh_token
