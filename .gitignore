@@ -34,3 +34,4 @@
 
 gemfile.lock
 config/database.yml
+config/environments/development.rb
