@@ -65,20 +65,6 @@ class Api::V1::UsersController < ApplicationController
       end
     end
 
-    def index
-      users = User.all
-        render json: {
-         users: users.map { |user|
-          {
-            id: user.id,
-            email: user.email,
-            username: user.username,
-            mobile_no: user.mobile_no,
-          }
-        }
-      }
-    end
-
     def show
       user = User.find(params[:id])
       render json: {
