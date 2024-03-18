@@ -1,5 +1,5 @@
 class Api::V1::UsersController < ApplicationController
-    skip_before_action :doorkeeper_authorize!, only: %i[create login show add_details]
+    skip_before_action :doorkeeper_authorize!, only: %i[create login show ]
 
     def create
       user = User.new(user_params)
@@ -69,6 +69,7 @@ class Api::V1::UsersController < ApplicationController
       user = User.find(params[:id])
       render json: {
       user: {
+        id: user.id,
         gender: user.gender,
         category: user.category,
         birth_date: user.birth_date,
@@ -79,18 +80,35 @@ class Api::V1::UsersController < ApplicationController
     end
 
   def add_details
-    user = User.find(params[:id])
-    if user.update(user_params)
-      render json: { message: 'User details updated successfully' }
+    user = current_user
+    if user.update(personal_params)
+      render json: { message: 'User details updated successfully' }, status: :ok
     else
       render json: { error: user.errors.full_messages }, status: :unprocessable_entity
+    end
+  end
+
+  def work_details
+    user = current_user
+    if user.update(work_params)
+      render json: {message: "Work details successfully added"}
+    else
+      render json: {error: user.errors.full_messages}, status: :unprocessable_entity
     end
   end
 
     private
 
     def user_params
-      params.require(:user).permit(:email, :password, :username, :mobile_no, :role, :gender, :category, :birth_date, :current_location, :profile_photo, :audition_posts)
+      params.require(:user).permit(:email, :password, :username, :mobile_no, :role,)
+    end
+
+    def personal_params
+      params.require(:user).permit(:gender, :category, :birth_date, :current_location, :profile_photo, :audition_posts)
+    end
+
+    def work_params
+      params.require(:user).permit(:project_name, :year, :youtube_link, :artist_role)
     end
 
     def generate_refresh_token
