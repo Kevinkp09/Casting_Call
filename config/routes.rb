@@ -18,7 +18,7 @@ Rails.application.routes.draw do
         get :show_work
         post :login
         post :add_details
-        post :show_work
+        post :work_details
       end
     end
   end
