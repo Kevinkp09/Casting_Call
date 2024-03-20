@@ -68,15 +68,14 @@ class Api::V1::UsersController < ApplicationController
     def show_details
       user = current_user
       render json: {
-      # user: {
-      #   id: user.id,
-      #   gender: user.gender,
-      #   category: user.category,
-      #   birth_date: user.birth_date,
-      #   current_location: user.current_location,
-      #   profile_photo: url_for(user.profile_photo)
-      #   }
-      user: user
+      user: {
+        id: user.id,
+        gender: user.gender,
+        category: user.category,
+        birth_date: user.birth_date,
+        current_location: user.current_location,
+        profile_photo: user.profile_photo.attached? ? url_for(user.profile_photo) : ''
+        }
       }, status: :ok
     end
 
