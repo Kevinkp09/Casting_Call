@@ -1,5 +1,5 @@
 class Api::V1::UsersController < ApplicationController
-    skip_before_action :doorkeeper_authorize!, only: %i[create login show ]
+    skip_before_action :doorkeeper_authorize!, only: %i[create login]
 
     def create
       user = User.new(user_params)
@@ -65,8 +65,8 @@ class Api::V1::UsersController < ApplicationController
       end
     end
 
-    def show
-      user = User.find(params[:id])
+    def show_details
+      user = current_user
       render json: {
       user: {
         id: user.id,
@@ -74,9 +74,9 @@ class Api::V1::UsersController < ApplicationController
         category: user.category,
         birth_date: user.birth_date,
         current_location: user.current_location,
-        profile_photo: user.profile_photo
+        profile_photo: user.profile_photo.attached? ? url_for(user.profile_photo) : ''
         }
-      }
+      }, status: :ok
     end
 
   def add_details
@@ -90,21 +90,41 @@ class Api::V1::UsersController < ApplicationController
 
   def work_details
     user = current_user
-    if user.update(work_params)
-      render json: {message: "Work details successfully added"}
+    youtube_link = params[:user][:youtube_link]
+    youtube_regex = User::VALID_MOBILE_REGEX
+
+    if youtube_link.match?(youtube_regex)
+      if user.update(work_params)
+        render json: {message: "Work details successfully added"}
+      else
+        render json: {error: user.errors.full_messages}, status: :unprocessable_entity
+      end
     else
-      render json: {error: user.errors.full_messages}, status: :unprocessable_entity
+        render json: { error: 'Invalid YouTube link' }, status: :unprocessable_entity
     end
+  end
+
+  def show_work
+    user = current_user
+    render json: {
+      user: {
+        id: user.id,
+        project_name: user.project_name,
+        artist_role: user.artist_role,
+        year: user.year,
+        youtube_link: user.youtube_link
+        }
+      }, status: :ok
   end
 
     private
 
     def user_params
-      params.require(:user).permit(:email, :password, :username, :mobile_no, :role,)
+      params.require(:user).permit(:email, :password, :username, :mobile_no, :role, :audition_posts)
     end
 
     def personal_params
-      params.require(:user).permit(:gender, :category, :birth_date, :current_location, :profile_photo, :audition_posts)
+      params.require(:user).permit(:gender, :category, :birth_date, :current_location, :profile_photo)
     end
 
     def work_params
