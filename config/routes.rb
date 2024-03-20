@@ -13,12 +13,13 @@ Rails.application.routes.draw do
   # root "posts#index"
   namespace :api do
     namespace :v1 do
-      resources :users, only: %i[create]
-      get '/details', to: 'users#show_details'
-      get '/work', to: 'users#show_work'
-      post 'login', to: 'users#login'
-      post '/details', to: 'users#add_details'
-      post '/work', to: 'users#work_details'
+      resources :users, only: %i[create] do
+        get :show_details
+        get :show_work
+        post :login
+        post :add_details
+        post :show_work
+      end
     end
   end
 end
