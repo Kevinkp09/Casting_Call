@@ -19,6 +19,7 @@ Rails.application.routes.draw do
         post :login
         post :add_details
         post :work_details
+        post :verify_otp, on: :collection
       end
     end
   end

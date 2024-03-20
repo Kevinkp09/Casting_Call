@@ -13,6 +13,11 @@ class User < ApplicationRecord
   validates :username, presence: true
   validates :role, presence: true
 
+  private
+  def generate_otp
+    SecureRandom.random_number(1000..9999).to_s
+  end
+
   def self.authenticate(email, password)
     user = User.find_for_authentication(email: email)
     user&.valid_password?(password) ? user : nil
