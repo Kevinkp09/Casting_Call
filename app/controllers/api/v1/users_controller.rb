@@ -7,8 +7,6 @@ class Api::V1::UsersController < ApplicationController
       return render(json: { error: 'Invalid client ID'}, status: 403) unless client_app
 
       if user.save
-        user.generate_otp
-        UserMailer.send_otp_email(user.email, user.otp).deliver_now
         # create access token for the user, so the user won't need to login again after registration
         access_token = Doorkeeper::AccessToken.create(
           resource_owner_id: user.id,
@@ -34,15 +32,6 @@ class Api::V1::UsersController < ApplicationController
         })
       else
         render(json: { error: 'Invalid user. Please check the provided information.', full_messages: user.errors.full_messages }, status: 422)
-      end
-    end
-
-    def verify_otp
-      @user = User.find_by(email: params[:email])
-      if @user && @user.otp == params[:otp]
-        render json: { message: 'OTP verified. User signed up successfully.' }, status: :ok
-      else
-        render json: { error: 'Invalid OTP. Please try again.' }, status: :unprocessable_entity
       end
     end
 
@@ -73,6 +62,16 @@ class Api::V1::UsersController < ApplicationController
         })
       else
         render json: {error: "Invalid email or password",full_messages: user.errors.full_messages }, status: :unprocessable_entity
+      end
+    end
+
+    def verify_otp
+      user = User.find_by(email: params[:user][:email])
+      otp = params[:user][:otp]
+      if user && user.otp == otp
+        render json: {message: "OTP verified successfully"}, status: :ok
+      else
+        render json: {message: "Invalid OTP"}, status: :unprocessable_entity
       end
     end
 
