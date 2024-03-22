@@ -1,5 +1,5 @@
 class Api::V1::UsersController < ApplicationController
-    skip_before_action :doorkeeper_authorize!, only: %i[create login]
+    skip_before_action :doorkeeper_authorize!, only: %i[create login verify_otp]
 
     def create
       user = User.new(user_params)
@@ -19,7 +19,7 @@ class Api::V1::UsersController < ApplicationController
         # return json containing access token and refresh token
         # so that user won't need to call login API right after registration
         render(json: {
-          message: 'User created successfully',
+          message: 'User created successfully. Check your email for OTP verification',
           user: {
             id: user.id,
             email: user.email,
@@ -65,6 +65,16 @@ class Api::V1::UsersController < ApplicationController
       end
     end
 
+    def verify_otp
+      user = User.find_by(email: params[:user][:email])
+      otp = params[:user][:otp]
+      if user && user.otp == otp
+        render json: {message: "OTP verified successfully"}, status: :ok
+      else
+        render json: {message: "Invalid OTP"}, status: :unprocessable_entity
+      end
+    end
+
     def show_details
       user = current_user
       render json: {
@@ -91,16 +101,15 @@ class Api::V1::UsersController < ApplicationController
   def work_details
     user = current_user
     youtube_link = params[:user][:youtube_link]
-    youtube_regex = User::VALID_MOBILE_REGEX
-
-    if youtube_link.match?(youtube_regex)
-      if user.update(work_params)
-        render json: {message: "Work details successfully added"}
+    youtube_regex = User::VALID_LINK_REGEX
+    if user.update(work_params)
+      if youtube_link.match?(youtube_regex)
+        render json: { message: "Work details successfully added" }
       else
-        render json: {error: user.errors.full_messages}, status: :unprocessable_entity
+        render json: { error: 'Invalid YouTube link' }, status: :unprocessable_entity
       end
     else
-        render json: { error: 'Invalid YouTube link' }, status: :unprocessable_entity
+      render json: { error: user.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
@@ -120,7 +129,7 @@ class Api::V1::UsersController < ApplicationController
     private
 
     def user_params
-      params.require(:user).permit(:email, :password, :username, :mobile_no, :role, :audition_posts)
+      params.require(:user).permit(:email, :password, :username, :mobile_no, :role, :audition_posts, :otp)
     end
 
     def personal_params

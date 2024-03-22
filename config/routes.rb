@@ -16,9 +16,10 @@ Rails.application.routes.draw do
       resources :users, only: %i[create] do
         get :show_details
         get :show_work
-        post :login
+        post :login, on: :collection
         post :add_details
         post :work_details
+        post :verify_otp, on: :collection
       end
     end
   end
