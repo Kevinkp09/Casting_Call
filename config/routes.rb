@@ -3,7 +3,7 @@ Rails.application.routes.draw do
     skip_controllers :authorizations, :applications, :authorized_applications
   end
   devise_for :users,  contollers: {
-    omniauth_callbacks: 'users/omniauth_callbacks'
+    omniauth_callbacks: 'api/v1/omniauth_callbacks'
 }
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
