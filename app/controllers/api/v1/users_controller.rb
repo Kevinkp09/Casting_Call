@@ -105,7 +105,7 @@ class Api::V1::UsersController < ApplicationController
     youtube_regex = User::VALID_LINK_REGEX
     if user.update(work_params)
       if youtube_link.match?(youtube_regex)
-        render json: { message: "Work details successfully added" }
+        render json: { message: "Work details successfully added" }, status: :ok
       else
         render json: { error: 'Invalid YouTube link' }, status: :unprocessable_entity
       end
@@ -125,6 +125,35 @@ class Api::V1::UsersController < ApplicationController
         youtube_link: user.youtube_link
         }
       }, status: :ok
+  end
+
+  def view_requests
+    pending_requests = User.where(approval_status: :pending)
+    render json: pending_requests, status: :ok
+  end
+
+  def approve_request
+    user = User.find_by(id: params[:user][:id])
+      if user.approval_status == approved || user.approval_status == rejected
+      render json: {error: "User is already approved or rejected, it can't be done again"}, status: :unprocessable_entity
+    end
+    if user.update(approval_status: :approved)
+      render json: {message: "Agency is approved"}, status: :ok
+    else
+      render json: {error: user.errors.full_messages}, status: :unprocessable_entity
+    end
+  end
+
+  def reject_request
+    user = User.find_by(id: params[:user][:id])
+    if user.approval_status == approved || user.approval_status == rejected
+      render json: {error: "User is already approved or rejected, it can't be done again"}, status: :unprocessable_entity
+    end
+    if user.update(approval_status: :rejected)
+      render json: {message: "Agency is rejected"}, status: :ok
+    else
+      render json: {error: user.errors.full_messages}, status: :unprocessable_entity
+    end
   end
 
     private
