@@ -22,6 +22,7 @@ Rails.application.routes.draw do
         post :add_details, on: :collection
         post :work_details, on: :collection
         post :verify_otp, on: :collection
+        post :view_requests, on: :collection
       end
     end
   end

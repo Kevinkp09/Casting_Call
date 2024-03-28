@@ -137,10 +137,6 @@ class Api::V1::UsersController < ApplicationController
       params.require(:user).permit(:gender, :category, :birth_date, :current_location, :profile_photo)
     end
 
-    def work_params
-      params.require(:user).permit(:project_name, :year, :youtube_link, :artist_role)
-    end
-
     def generate_refresh_token
       loop do
         # generate a random token string and return it,

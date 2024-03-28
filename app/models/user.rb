@@ -6,9 +6,9 @@ class User < ApplicationRecord
          :omniauthable, omniauth_providers: [:google_oauth2]
   enum role: {artist: 0, agency: 1, admin: 2}
          VALID_MOBILE_REGEX = /\A\d{10}\z/
-         VALID_LINK_REGEX = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()!@:%_\+.~#?&\/\/=]*)/
   has_one_attached :profile_photo
   has_many_attached :audition_posts
+  has_many :works
   validates :email, format: URI::MailTo::EMAIL_REGEXP
   validates :mobile_no, presence: true, format: { with: VALID_MOBILE_REGEX, message: "Invalid" }
   validates :username, presence: true
