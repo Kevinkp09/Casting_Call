@@ -58,6 +58,7 @@ class Api::V1::UsersController < ApplicationController
           role: user.role,
           email: user.email,
           access_token: access_token.token,
+          username: user.username,
           token_type: 'bearer',
           expires_in: access_token.expires_in,
           refresh_token: access_token.refresh_token,
