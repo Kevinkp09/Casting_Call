@@ -128,7 +128,7 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def view_requests
-    pending_requests = User.where(approval_status: :pending)
+    pending_requests = User.where(approval_status: :pending, role: :agency)
     render json: pending_requests, status: :ok
   end
 
