@@ -5,6 +5,7 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable,
          :omniauthable, omniauth_providers: [:google_oauth2]
   enum role: {artist: 0, agency: 1, admin: 2}
+  enum approval_status: {pending: 0, approved: 1, rejected: 2}
          VALID_MOBILE_REGEX = /\A\d{10}\z/
          VALID_LINK_REGEX = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()!@:%_\+.~#?&\/\/=]*)/
   has_one_attached :profile_photo
