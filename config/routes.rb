@@ -22,7 +22,8 @@ Rails.application.routes.draw do
         post :verify_otp, on: :collection
         post :view_requests, on: :collection
       end
-        resources :works
+        resources :works, only: [:index, :update, :create, :destroy]
+
     end
   end
 end
