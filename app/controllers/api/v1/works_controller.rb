@@ -1,10 +1,13 @@
-class WorksController < ApplicationController
+class Api::V1::WorksController < ApplicationController
   def index
-    works = Work.all
+    user = current_user
+    works = user.works
+    render json: works, status: :ok
   end
 
   def create
-    work = Work.new(work_params)
+    user = current_user
+    work = user.works.new(work_params)
     if work.save
       render json: {message: "Work details added successfully"}, status: :ok
     else
@@ -23,7 +26,7 @@ class WorksController < ApplicationController
 
   def destroy
     work = Work.find(params[:id])
-    work.destroy 
+    work.destroy
   end
 
   private
