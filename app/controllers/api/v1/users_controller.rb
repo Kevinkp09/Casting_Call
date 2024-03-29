@@ -99,34 +99,6 @@ class Api::V1::UsersController < ApplicationController
     end
   end
 
-  def work_details
-    user = current_user
-    youtube_link = params[:user][:youtube_link]
-    youtube_regex = User::VALID_LINK_REGEX
-    if user.update(work_params)
-      if youtube_link.match?(youtube_regex)
-        render json: { message: "Work details successfully added" }
-      else
-        render json: { error: 'Invalid YouTube link' }, status: :unprocessable_entity
-      end
-    else
-      render json: { error: user.errors.full_messages }, status: :unprocessable_entity
-    end
-  end
-
-  def show_work
-    user = current_user
-    render json: {
-      user: {
-        id: user.id,
-        project_name: user.project_name,
-        artist_role: user.artist_role,
-        year: user.year,
-        youtube_link: user.youtube_link
-        }
-      }, status: :ok
-  end
-
     private
 
     def user_params
