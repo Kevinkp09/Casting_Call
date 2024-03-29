@@ -103,6 +103,7 @@ class Api::V1::UsersController < ApplicationController
     end
   end
 
+
   def work_details
     user = current_user
     youtube_link = params[:user][:youtube_link]
@@ -137,6 +138,11 @@ class Api::V1::UsersController < ApplicationController
      render json: pending_requests, status: :ok
     else
       render json: {error: "No pending request present"}, status: :not_found
+    private
+
+    def user_params
+      params.require(:user).permit(:email, :password, :username, :mobile_no, :role, :audition_posts, :otp)
+
     end
   end
 
@@ -201,3 +207,5 @@ class Api::V1::UsersController < ApplicationController
     end
   end
 end
+end
+end 

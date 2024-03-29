@@ -17,13 +17,13 @@ Rails.application.routes.draw do
     namespace :v1 do
       resources :users, only: %i[create] do
         get :show_details, on: :collection
-        get :show_work, on: :collection
         post :login, on: :collection
         post :add_details, on: :collection
-        post :work_details, on: :collection
         post :verify_otp, on: :collection
         get :view_requests, on: :collection
       end
+        resources :works, only: [:index, :update, :create, :destroy]
+
     end
   end
 end
