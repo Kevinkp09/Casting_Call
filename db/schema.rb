@@ -10,6 +10,8 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
+
+ActiveRecord::Schema[7.1].define(version: 2024_03_28_084924) do
 ActiveRecord::Schema[7.1].define(version: 2024_03_27_092954) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
@@ -82,10 +84,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_03_27_092954) do
     t.string "category"
     t.date "birth_date"
     t.string "current_location"
-    t.string "project_name"
-    t.string "artist_role"
-    t.date "year"
-    t.string "youtube_link"
     t.string "otp"
     t.datetime "otp_generated_time"
     t.integer "approval_status", default: 0
@@ -93,7 +91,19 @@ ActiveRecord::Schema[7.1].define(version: 2024_03_27_092954) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  create_table "works", force: :cascade do |t|
+    t.string "project_name"
+    t.string "artist_role"
+    t.date "year"
+    t.string "youtube_link"
+    t.integer "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_works_on_user_id"
+  end
+
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "oauth_access_tokens", "oauth_applications", column: "application_id"
+  add_foreign_key "works", "users"
 end
