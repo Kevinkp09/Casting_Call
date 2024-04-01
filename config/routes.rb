@@ -20,11 +20,16 @@ Rails.application.routes.draw do
         post :login, on: :collection
         post :add_details, on: :collection
         post :verify_otp, on: :collection
+        put :approve_request, on: :collection
+        put :reject_request, on: :collection
         get :view_requests, on: :collection
         get :show_approved_agencies, on: :collection
         get :show_registered_artist, on: :collection
       end
         resources :works, only: [:index, :update, :create, :destroy]
+        resources :posts, only: [:create] do
+          get :view_applied_artist, on: :collection
+       end
     end
   end
 end

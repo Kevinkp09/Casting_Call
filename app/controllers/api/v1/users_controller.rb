@@ -34,7 +34,7 @@ class Api::V1::UsersController < ApplicationController
         }
       })
     else
-      render(json: { error: 'Invalid user. Please check the provided information.', full_messages: user.errors.full_messages }, status: 422)
+      render json: { error: 'Invalid user. Please check the provided information.', full_messages: user.errors.full_messages }, status: 422
     end
   end
 
@@ -66,7 +66,7 @@ class Api::V1::UsersController < ApplicationController
         }
       })
     else
-      render json: {error: "Invalid email or password",full_messages: user.errors.full_messages }, status: :unprocessable_entity
+      render json: {error: "Invalid email or password" }, status: :unprocessable_entity
     end
   end
 
@@ -118,7 +118,7 @@ class Api::V1::UsersController < ApplicationController
         render json: {error: "User is already approved or rejected, it can't be done again"}, status: :unprocessable_entity
       end
       if user.update(approval_status: :approved)
-        render json: {message: "Agency is approved"}, status: :ok
+        render json: {message: "Agency is approved", id: user.id, status: user.approval_status}, status: :ok
       else
         render json: {error: user.errors.full_messages}, status: :unprocessable_entity
       end
@@ -130,7 +130,7 @@ class Api::V1::UsersController < ApplicationController
       render json: {error: "User is already approved or rejected, it can't be done again"}, status: :unprocessable_entity
     end
     if user.update(approval_status: :rejected)
-      render json: {message: "Agency is rejected"}, status: :ok
+      render json: {message: "Agency is rejected", id: user.id, status: user.approval_status}, status: :ok
     else
       render json: {error: user.errors.full_messages}, status: :unprocessable_entity
     end
@@ -155,8 +155,6 @@ class Api::V1::UsersController < ApplicationController
   def personal_params
     params.require(:user).permit(:gender, :category, :birth_date, :current_location, :profile_photo)
   end
-
-
 
   def generate_refresh_token
     loop do
