@@ -1,6 +1,6 @@
 class Api::V1::UsersController < ApplicationController
     skip_before_action :doorkeeper_authorize!, only: %i[create login verify_otp]
-    before_action :check_admin, only: [:view_requests, :approve_request, :reject_request]
+    before_action :check_admin, only: [:view_requests, :approve_request, :reject_request ,:show_approved_agencies, :show_registered_artist]
 
   def create
     user = User.new(user_params)
@@ -103,59 +103,25 @@ class Api::V1::UsersController < ApplicationController
     end
   end
 
-
-  def work_details
-    user = current_user
-    youtube_link = params[:user][:youtube_link]
-    youtube_regex = User::VALID_LINK_REGEX
-    if user.update(work_params)
-      if youtube_link.match?(youtube_regex)
-        render json: { message: "Work details successfully added" }, status: :ok
-      else
-        render json: { error: 'Invalid YouTube link' }, status: :unprocessable_entity
-      end
-    else
-      render json: { error: user.errors.full_messages }, status: :unprocessable_entity
-    end
-  end
-
-  def show_work
-    user = current_user
-    render json: {
-      user: {
-        id: user.id,
-        project_name: user.project_name,
-        artist_role: user.artist_role,
-        year: user.year,
-        youtube_link: user.youtube_link
-        }
-      }, status: :ok
-  end
-
   def view_requests
     pending_requests = User.where(approval_status: :pending, role: :agency)
     if pending_requests
      render json: pending_requests, status: :ok
     else
       render json: {error: "No pending request present"}, status: :not_found
-    private
-
-    def user_params
-      params.require(:user).permit(:email, :password, :username, :mobile_no, :role, :audition_posts, :otp)
-
     end
   end
 
   def approve_request
     user = User.find_by(id: params[:user][:id])
       if user.approval_status == "approved" || user.approval_status == "rejected"
-      render json: {error: "User is already approved or rejected, it can't be done again"}, status: :unprocessable_entity
-    end
-    if user.update(approval_status: :approved)
-      render json: {message: "Agency is approved"}, status: :ok
-    else
-      render json: {error: user.errors.full_messages}, status: :unprocessable_entity
-    end
+        render json: {error: "User is already approved or rejected, it can't be done again"}, status: :unprocessable_entity
+      end
+      if user.update(approval_status: :approved)
+        render json: {message: "Agency is approved"}, status: :ok
+      else
+        render json: {error: user.errors.full_messages}, status: :unprocessable_entity
+      end
   end
 
   def reject_request
@@ -170,16 +136,18 @@ class Api::V1::UsersController < ApplicationController
     end
   end
 
+  def show_approved_agencies
+    user = User.where(approval_status: :approved, role: :agency)
+    render json: user, status: :ok
+  end
+
+  def show_registered_artist
+    user = User.where(role: :artist)
+    render json: user, status: :ok
+  end
+
   private
 
-
-    def generate_refresh_token
-      loop do
-        # generate a random token string and return it,
-        # unless there is already another token with the same string
-        token = SecureRandom.hex(32)
-        break token unless Doorkeeper::AccessToken.exists?(refresh_token: token)
-      end
   def user_params
     params.require(:user).permit(:email, :password, :username, :mobile_no, :role, :audition_posts, :otp)
   end
@@ -188,9 +156,7 @@ class Api::V1::UsersController < ApplicationController
     params.require(:user).permit(:gender, :category, :birth_date, :current_location, :profile_photo)
   end
 
-  def work_params
-    params.require(:user).permit(:project_name, :year, :youtube_link, :artist_role)
-  end
+
 
   def generate_refresh_token
     loop do
@@ -207,5 +173,3 @@ class Api::V1::UsersController < ApplicationController
     end
   end
 end
-end
-end 
