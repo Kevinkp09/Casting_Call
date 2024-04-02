@@ -18,7 +18,7 @@ Rails.application.routes.draw do
       resources :users, only: %i[create] do
         get :show_details, on: :collection
         post :login, on: :collection
-        post :add_details, on: :collection
+        put :add_details, on: :collection
         post :verify_otp, on: :collection
         put :approve_request, on: :collection
         put :reject_request, on: :collection

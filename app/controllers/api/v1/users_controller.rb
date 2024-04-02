@@ -108,7 +108,7 @@ class Api::V1::UsersController < ApplicationController
     rejected_requests = User.where(approval_status: :rejected)
     all_requests = pending_requests + rejected_requests
     if all_requests
-     render json: pending_requests, status: :ok
+     render json: all_requests, status: :ok
     else
       render json: {error: "No pending request present"}, status: :not_found
     end
@@ -132,7 +132,7 @@ class Api::V1::UsersController < ApplicationController
       render json: {error: "User is already approved or rejected, it can't be done again"}, status: :unprocessable_entity
     end
     if user.update(approval_status: :rejected)
-      render json: {message: "Agency is rejected", id: user.id, status: user.approval_status}, status: :ok
+      render json: user, status: :ok
     else
       render json: {error: user.errors.full_messages}, status: :unprocessable_entity
     end
