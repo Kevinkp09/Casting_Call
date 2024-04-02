@@ -29,6 +29,7 @@ Rails.application.routes.draw do
         resources :works, only: [:index, :update, :create, :destroy]
         resources :posts, only: [:create, :index] do
           get :view_applied_artist, on: :collection
+          get :show_posts, on: :collection
        end
     end
   end

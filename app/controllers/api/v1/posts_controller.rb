@@ -1,9 +1,17 @@
 class Api::V1::PostsController < ApplicationController
-  before_action :approved_agency
+  before_action :approved_agency, only: [:create, :show_posts]
 
   def index
+    if user.role == "artist"
+      posts = Post.all
+      render json: posts, status: :ok
+    end
+  end
+
+  def show_posts
+    user = current_user
     posts = user.posts
-    render json: posts, status: :ok
+    render posts, status: :ok
   end
 
   def create
@@ -22,6 +30,7 @@ class Api::V1::PostsController < ApplicationController
   end
 
   def approved_agency
+    user = current_user
     user.role == "agency" && user.approval_status = approved
   end
 end
