@@ -104,9 +104,7 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def view_requests
-    pending_requests = User.where(approval_status: :pending, role: :agency)
-    rejected_requests = User.where(approval_status: :rejected)
-    all_requests = pending_requests + rejected_requests
+    all_requests = User.where(approval_status: [:pending, :rejected], role: :agency)
     if all_requests
      render json: all_requests, status: :ok
     else
