@@ -10,7 +10,7 @@ class Api::V1::PostsController < ApplicationController
 
   def show_posts
     posts = current_user.posts
-    render posts, status: :ok
+    render json: posts, status: :ok
   end
 
   def create
@@ -18,16 +18,17 @@ class Api::V1::PostsController < ApplicationController
     if post.save
       render json: {message: "Post added successfully"}, status: :ok
     else
-      render json: {error: "Error in creating post"}, status: :unprocessable_entity
+      render json: {error: post.errors.full_messages}, status: :unprocessable_entity
     end
   end
 
   private
   def post_params
-    params.require(:post).permit(:title, :age, :location, :description, :role, :category, :user_id)
+    params.require(:post).permit(:title, :age, :location, :description, :role, :category)
   end
 
   def approved_agency
-    current_user.role == "agency" && current_user.approval_status = "approved"
+     return if current_user.role == "agency" && current_user.approval_status = "approved"
+     render json: {error: "You are not authorized for this action"}, status: :unprocessable_entity
   end
 end
