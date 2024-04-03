@@ -1,14 +1,20 @@
 class Api::V1::PostsController < ApplicationController
-  before_action :approved_agency
+  before_action :approved_agency, only: [:create, :show_posts]
 
   def index
-    posts = user.posts
-    render json: posts, status: :ok
+    if current_user.role == "artist"
+      posts = Post.all
+      render json: posts, status: :ok
+    end
+  end
+
+  def show_posts
+    posts = current_user.posts
+    render posts, status: :ok
   end
 
   def create
-    user = current_user
-    post = user.posts.new(post_params)
+    post = current_user.posts.new(post_params)
     if post.save
       render json: {message: "Post added successfully"}, status: :ok
     else
@@ -22,6 +28,6 @@ class Api::V1::PostsController < ApplicationController
   end
 
   def approved_agency
-    user.role == "agency" && user.approval_status = approved
+    current_user.role == "agency" && current_user.approval_status = "approved"
   end
 end

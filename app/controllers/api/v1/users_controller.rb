@@ -105,8 +105,10 @@ class Api::V1::UsersController < ApplicationController
 
   def view_requests
     pending_requests = User.where(approval_status: :pending, role: :agency)
-    if pending_requests
-     render json: pending_requests, status: :ok
+    rejected_requests = User.where(approval_status: :rejected)
+    all_requests = pending_requests + rejected_requests
+    if all_requests
+     render json: all_requests, status: :ok
     else
       render json: {error: "No pending request present"}, status: :not_found
     end
@@ -130,7 +132,7 @@ class Api::V1::UsersController < ApplicationController
       render json: {error: "User is already approved or rejected, it can't be done again"}, status: :unprocessable_entity
     end
     if user.update(approval_status: :rejected)
-      render json: {message: "Agency is rejected", id: user.id, status: user.approval_status}, status: :ok
+      render json: user, status: :ok
     else
       render json: {error: user.errors.full_messages}, status: :unprocessable_entity
     end
@@ -149,7 +151,7 @@ class Api::V1::UsersController < ApplicationController
   private
 
   def user_params
-    params.require(:user).permit(:email, :password, :username, :mobile_no, :role, :audition_posts, :otp)
+    params.require(:user).permit(:email, :password, :username, :mobile_no, :role, :otp)
   end
 
   def personal_params

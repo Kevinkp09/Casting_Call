@@ -18,7 +18,7 @@ Rails.application.routes.draw do
       resources :users, only: %i[create] do
         get :show_details, on: :collection
         post :login, on: :collection
-        post :add_details, on: :collection
+        put :add_details, on: :collection
         post :verify_otp, on: :collection
         put :approve_request, on: :collection
         put :reject_request, on: :collection
@@ -29,6 +29,7 @@ Rails.application.routes.draw do
         resources :works, only: [:index, :update, :create, :destroy]
         resources :posts, only: [:create, :index] do
           get :view_applied_artist, on: :collection
+          get :show_posts, on: :collection
        end
     end
   end

@@ -8,7 +8,6 @@ class User < ApplicationRecord
   enum approval_status: {pending: 0, approved: 1, rejected: 2}
          VALID_MOBILE_REGEX = /\A\d{10}\z/
   has_one_attached :profile_photo
-  has_many_attached :audition_posts
   has_many :works
   has_many :posts
   validates :email, format: URI::MailTo::EMAIL_REGEXP
