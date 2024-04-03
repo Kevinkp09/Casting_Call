@@ -9,7 +9,6 @@ class Api::V1::PostsController < ApplicationController
   end
 
   def show_posts
-    user = current_user
     posts = user.posts
     render posts, status: :ok
   end
