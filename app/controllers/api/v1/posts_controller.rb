@@ -9,12 +9,17 @@ class Api::V1::PostsController < ApplicationController
   end
 
   def show_posts
-    posts = current_user.posts
-    render json: posts, status: :ok
+    if params[:agency_id].present?
+      posts = Post.where(agency_id: params[:agency_id])
+      render json: posts, status: :ok
+    else
+      render json: {error: "Not found"}, status: 404
+    end
   end
 
   def create
-    post = current_user.posts.new(post_params)
+    post = Post.new(post_params)
+    post.agency = current_user
     if post.save
       render json: {message: "Post added successfully"}, status: :ok
     else
@@ -28,7 +33,8 @@ class Api::V1::PostsController < ApplicationController
   end
 
   def approved_agency
-     return if current_user.role == "agency" && current_user.approval_status = "approved"
-     render json: {error: "You are not authorized for this action"}, status: :unprocessable_entity
+     unless current_user.role == "agency" && current_user.approval_status == "approved"
+       render json: {error: "You are not authorized for this action"}, status: :unauthorized
+     end
   end
 end
