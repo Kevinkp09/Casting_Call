@@ -42,6 +42,10 @@ class Api::V1::RequestsController < ApplicationController
 
   def set_post
     @post = Post.find(params[:post_id])
+    if @post.nil
+      render json: {message: "Post not found"}, status: 404
+      return 
+    end
   end
 
   def check_request_status
