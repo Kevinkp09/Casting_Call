@@ -9,7 +9,8 @@ class User < ApplicationRecord
          VALID_MOBILE_REGEX = /\A\d{10}\z/
   has_one_attached :profile_photo
   has_many :works
-  has_many :posts
+  has_many :requests
+  has_many :posts, through: :requests
   validates :email, format: URI::MailTo::EMAIL_REGEXP
   validates :mobile_no, presence: true, format: { with: VALID_MOBILE_REGEX, message: "Invalid" }
   validates :username, presence: true
