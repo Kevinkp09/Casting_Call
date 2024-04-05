@@ -29,8 +29,7 @@ class Api::V1::UsersController < ApplicationController
           token_type: 'bearer',
           expires_in: access_token.expires_in,
           refresh_token: access_token.refresh_token,
-          created_at: access_token.created_at.to_time.to_i,
-          otp: user.otp
+          created_at: access_token.created_at.to_time.to_i
         }
       })
     else
@@ -40,6 +39,10 @@ class Api::V1::UsersController < ApplicationController
 
   def login
     user = User.find_for_authentication(email: params[:user][:email])
+    if user.nil?
+    render json: { error: "User not found" }, status: :not_found
+    return
+    end
     if user&.valid_password?(params[:user][:password])
 
       client_app = Doorkeeper::Application.find_by(uid: params[:client_id])
