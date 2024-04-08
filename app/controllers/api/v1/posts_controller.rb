@@ -1,12 +1,17 @@
 class Api::V1::PostsController < ApplicationController
   before_action :approved_agency, only: [:create, :show_posts]
-  before_action :set_post, only: [:update, :destroy]
+  before_action :set_post, only: [:update, :destroy, :show] 
 
   def index
     if current_user.role == "artist"
       posts = Post.all
       render json: posts, status: :ok
     end
+  end
+
+  def show
+    requests = @post.requests
+    render json: requests, status: :ok
   end
 
   def show_posts
@@ -22,7 +27,7 @@ class Api::V1::PostsController < ApplicationController
     post = Post.new(post_params)
     post.agency = current_user
     if post.save
-      render json: {message: "Post added successfully"}, status: :ok
+      render json: {id: post.id, message: "Post added successfully"}, status: :ok
     else
       render json: {error: post.errors.full_messages}, status: :unprocessable_entity
     end
