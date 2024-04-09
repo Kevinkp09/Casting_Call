@@ -1,6 +1,6 @@
 class Api::V1::PostsController < ApplicationController
   before_action :approved_agency, only: [:create, :show_posts]
-  before_action :set_post, only: [:update, :destroy, :show] 
+  before_action :set_post, only: [:update, :destroy, :show]
 
   def index
     if current_user.role == "artist"
@@ -10,7 +10,7 @@ class Api::V1::PostsController < ApplicationController
   end
 
   def show
-    requests = @post.requests
+    requests = @post.requests.map{|r| r.attributes.merge({user: r.user})}
     render json: requests, status: :ok
   end
 
