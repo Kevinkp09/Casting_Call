@@ -1,10 +1,6 @@
 class Api::V1::RequestsController < ApplicationController
-  before_action :set_post, only: [:index, :create]
+  before_action :set_post, only: [:create]
   before_action :check_request_status, only: [:approve_artist, :reject_artist]
-  def index
-    requests = @post.requests
-    render json: requests, status: :ok
-  end
 
   def create
     if current_user.role == "artist"
@@ -42,9 +38,9 @@ class Api::V1::RequestsController < ApplicationController
 
   def set_post
     @post = Post.find(params[:post_id])
-    if @post.nil
+    if @post.nil?
       render json: {message: "Post not found"}, status: 404
-      return 
+      return
     end
   end
 
