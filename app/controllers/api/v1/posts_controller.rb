@@ -42,10 +42,14 @@ class Api::V1::PostsController < ApplicationController
   end
 
   def destroy
-    if @post.user == current_user && @post.destroy
-      render json: {message: "Post deleted successfully"}, status: :ok
+    if @post.agency == current_user
+      if @post.requests.destroy_all && @post.destroy
+        render json: {message: "Post deleted successfully"}, status: :ok
+      else
+        render json: {error: @post.errors.full_messages}, status: :unprocessable_entity
+      end
     else
-      render json: {error: @post.errors.full_messages}, status: :unprocessable_entity
+      render json: {message: "You are not the owner of this post"}, status: :unauthorized
     end
   end
 
