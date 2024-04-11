@@ -40,8 +40,8 @@ class Api::V1::UsersController < ApplicationController
   def login
     user = User.find_for_authentication(email: params[:user][:email])
     if user.nil?
-    render json: { error: "User not found" }, status: :not_found
-    return
+      render json: { error: "User not found" }, status: :not_found
+      return
     end
     if user&.valid_password?(params[:user][:password])
 

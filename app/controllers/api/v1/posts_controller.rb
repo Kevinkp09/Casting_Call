@@ -34,7 +34,7 @@ class Api::V1::PostsController < ApplicationController
   end
 
   def update
-    if @post.user == current_user && @post.update(post_params)
+    if @post.agency == current_user && @post.update(post_params)
       render json: {message: "Post is updated successfully"}, status: :ok
     else
       render json: {error: @post.errors.full_messages}, status: :unprocessable_entity

@@ -16,10 +16,10 @@ class Api::V1::RequestsController < ApplicationController
   end
 
   def approve_artist
-    if @request.update(status: :approved)
-      render json: {message: "Request is approved", id: @request.id, status: @request.status}, status: :ok
+    if @request.update(status: :shortlisted)
+      render json: {message: "Request is shortlisted", id: @request.id, status: @request.status}, status: :ok
     else
-      render json: {error: request.errors.full_messages}, status: :unprocessable_entity
+      render json: {error: @request.errors.full_messages}, status: :unprocessable_entity
     end
   end
 
@@ -27,7 +27,7 @@ class Api::V1::RequestsController < ApplicationController
     if @request.update(status: :rejected)
       render json: {message: "Request is rejected", id: @request.id, status: @request.status}, status: :ok
     else
-      render json: {error: request.errors.full_messages}, status: :unprocessable_entity
+      render json: {error: @request.errors.full_messages}, status: :unprocessable_entity
     end
   end
 
@@ -50,8 +50,8 @@ class Api::V1::RequestsController < ApplicationController
       render json: {message: "Request not found"}, status: 404
       return
     end
-    if @request.status == "approved" || @request.status == "rejected"
-      render json: {error: "Request is already approved or rejected, it can't be done again"}, status: :unprocessable_entity
+    if @request.status == "shortlisted" || @request.status == "rejected"
+      render json: {error: "Request is already shortlisted or rejected, it can't be done again"}, status: :unprocessable_entity
     end
   end
 end
