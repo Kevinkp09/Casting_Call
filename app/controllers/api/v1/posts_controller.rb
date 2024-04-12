@@ -4,19 +4,19 @@ class Api::V1::PostsController < ApplicationController
 
   def index
     if current_user.role == "artist"
-      posts = Post.all
+      posts = Post.all.order(created_at: :desc)
       render json: posts, status: :ok
     end
   end
 
   def show
-    requests = @post.requests.map{|r| r.attributes.merge({user: r.user})}
+    requests = @post.requests.order(created_at: :desc).map{|r| r.attributes.merge({user: r.user})}
     render json: requests, status: :ok
   end
 
   def show_posts
     if params[:agency_id].present?
-      posts = Post.where(agency_id: params[:agency_id])
+      posts = Post.where(agency_id: params[:agency_id]).order(created_at: :desc)
       render json: posts, status: :ok
     else
       render json: {error: "Not found"}, status: 404
