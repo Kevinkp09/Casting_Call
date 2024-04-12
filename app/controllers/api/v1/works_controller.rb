@@ -1,7 +1,7 @@
 class Api::V1::WorksController < ApplicationController
   def index
     user = current_user
-    works = user.works
+    works = user.works.order(created_at: :desc)
     render json: works, status: :ok
   end
 

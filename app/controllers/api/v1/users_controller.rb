@@ -40,8 +40,8 @@ class Api::V1::UsersController < ApplicationController
   def login
     user = User.find_for_authentication(email: params[:user][:email])
     if user.nil?
-    render json: { error: "User not found" }, status: :not_found
-    return
+      render json: { error: "User not found" }, status: :not_found
+      return
     end
     if user&.valid_password?(params[:user][:password])
 
@@ -107,7 +107,7 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def view_requests
-    all_requests = User.where(approval_status: [:pending, :rejected], role: :agency)
+    all_requests = User.where(approval_status: [:pending, :rejected], role: :agency).order(created_at: :desc)
     if all_requests
      render json: all_requests, status: :ok
     else
@@ -145,7 +145,7 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def show_registered_artist
-    user = User.where(role: :artist)
+    user = User.where(role: :artist).order(created_at: :desc)
     render json: user, status: :ok
   end
 
