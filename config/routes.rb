@@ -35,6 +35,7 @@ Rails.application.routes.draw do
           put :approve_artist, on: :member
           put :reject_artist, on: :member
        end
+       resources :packages
     end
   end
 end
