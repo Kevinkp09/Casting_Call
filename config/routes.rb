@@ -35,7 +35,10 @@ Rails.application.routes.draw do
           put :approve_artist, on: :member
           put :reject_artist, on: :member
        end
-       resources :packages
+       resources :packages do
+         put :upgrade_basic, on: :member
+         put :upgrade_advance, on: :member
+       end
     end
   end
 end
