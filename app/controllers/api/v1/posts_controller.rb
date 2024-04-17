@@ -1,5 +1,4 @@
 class Api::V1::PostsController < ApplicationController
-  before_action :approved_agency, only: [:create, :show_posts]
   before_action :set_post, only: [:update, :destroy, :show]
 
   def index
@@ -66,9 +65,4 @@ class Api::V1::PostsController < ApplicationController
     end
   end
 
-  def approved_agency
-     unless current_user.role == "agency" && current_user.approval_status == "approved"
-       render json: {error: "You are not authorized for this action"}, status: :unauthorized
-     end
-  end
 end
