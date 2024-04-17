@@ -1,12 +1,14 @@
 class Api::V1::UsersController < ApplicationController
     skip_before_action :doorkeeper_authorize!, only: %i[create login verify_otp]
-    before_action :check_admin, only: [:view_requests, :approve_request, :reject_request ,:show_approved_agencies, :show_registered_artist]
+    before_action :check_admin, only: [:view_requests, :reject_request ,:show_approved_agencies, :show_registered_artist]
 
   def create
     user = User.new(user_params)
     client_app = Doorkeeper::Application.find_by(uid: params[:client_id])
     return render(json: { error: 'Invalid client ID'}, status: 403) unless client_app
-
+    if user.role == "agency"
+      user.package = Package.find_or_create_by(name: "starter")
+    end
     if user.save
       # create access token for the user, so the user won't need to login again after registration
       access_token = Doorkeeper::AccessToken.create(
@@ -113,18 +115,6 @@ class Api::V1::UsersController < ApplicationController
     else
       render json: {error: "No pending request present"}, status: :not_found
     end
-  end
-
-  def approve_request
-    user = User.find_by(id: params[:user][:id])
-      if user.approval_status == "approved" || user.approval_status == "rejected"
-        render json: {error: "User is already approved or rejected, it can't be done again"}, status: :unprocessable_entity
-      end
-      if user.update(approval_status: :approved)
-        render json: {message: "Agency is approved", id: user.id, status: user.approval_status}, status: :ok
-      else
-        render json: {error: user.errors.full_messages}, status: :unprocessable_entity
-      end
   end
 
   def reject_request

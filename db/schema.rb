@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_04_04_092311) do
+ActiveRecord::Schema[7.1].define(version: 2024_04_16_120727) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -65,6 +65,16 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_04_092311) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["uid"], name: "index_oauth_applications_on_uid", unique: true
+  end
+
+  create_table "packages", force: :cascade do |t|
+    t.integer "name", default: 0
+    t.decimal "price", precision: 8, scale: 2
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "agency_id"
+    t.integer "posts_limit"
+    t.integer "requests_limit"
   end
 
   create_table "posts", force: :cascade do |t|
