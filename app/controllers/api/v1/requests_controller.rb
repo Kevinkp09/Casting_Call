@@ -8,7 +8,7 @@ class Api::V1::RequestsController < ApplicationController
       if request.save
         render json: request, status: :created
       else
-        render json: {error: "Error in creating request"}, status: :unprocessable_entity
+        render json: {error: request.errors.full_messages}, status: :unprocessable_entity
       end
     else
       render json: {error: "You are unauthorized for this action"}, status: :unauthorized

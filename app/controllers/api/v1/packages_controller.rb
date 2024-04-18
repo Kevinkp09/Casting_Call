@@ -1,7 +1,7 @@
 class Api::V1::PackagesController < ApplicationController
   def index
-    packages = Package.all
-    render json: {packages: packages, message: "All packages showing"}, status: :ok
+    packages = Package.all.order(:price)
+    render json: packages, status: :ok
   end
 
   def update
@@ -32,6 +32,6 @@ class Api::V1::PackagesController < ApplicationController
 
   private
   def package_params
-    params.require(:package).permit(:name, :price)
+    params.require(:package).permit(:name, :price, :posts_limit, :requests_limit)
   end
 end

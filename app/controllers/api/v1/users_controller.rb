@@ -4,14 +4,12 @@ class Api::V1::UsersController < ApplicationController
 
   def create
     user = User.new(user_params)
-    user.package = Package.find_or_create_by(name: "starter")
-
+    if user.role == "agency"
+      user.package = Package.find_or_create_by(name: "starter")
+    end
     client_app = Doorkeeper::Application.find_by(uid: params[:client_id])
     return render(json: { error: 'Invalid client ID'}, status: 403) unless client_app
     if user.save
-
-      binding.pry
-
       # create access token for the user, so the user won't need to login again after registration
       access_token = Doorkeeper::AccessToken.create(
         resource_owner_id: user.id,
@@ -132,8 +130,8 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def show_approved_agencies
-    user = User.where(approval_status: :approved, role: :agency)
-    render json: user, status: :ok
+    users = User.where(role: :agency).map { |user| { user: user, package_name: user.package&.name } }
+    render json: users, status: :ok
   end
 
   def show_registered_artist
