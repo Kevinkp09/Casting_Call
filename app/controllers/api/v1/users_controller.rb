@@ -99,6 +99,15 @@ class Api::V1::UsersController < ApplicationController
     }, status: :ok
   end
 
+  def find_user
+    user = User.find_by(id: doorkeeper_token[:resource_owner_id])
+    if user
+      render json: {user: user, message:"User rendered successfully"}, status: :ok
+    else
+      render json: {error: "User not found"}, status: :not_found
+    end
+  end
+
   def add_details
     user = current_user
     if user.update(personal_params)
@@ -165,6 +174,21 @@ class Api::V1::UsersController < ApplicationController
     else
       render json: {error: "You are unauthorized for this action"}, status: :unauthorized
     end
+  end
+
+  def filter_starter
+    starter_users = User.includes(:package).where(packages: {name: "starter"})
+    render json: starter_users, status: :ok
+  end
+
+   def filter_basic
+    basic_users = User.includes(:package).where(packages: {name: "basic"})
+    render json: basic_users, status: :ok
+  end
+
+   def filter_advance
+    advance_users = User.includes(:package).where(packages: {name: "advance"})
+    render json: advance_users, status: :ok
   end
   private
 

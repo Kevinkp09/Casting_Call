@@ -27,6 +27,10 @@ Rails.application.routes.draw do
         get :show_registered_artist, on: :collection
         put :upgrade_basic, on: :collection
         put :upgrade_advance, on: :collection
+        get :find_user
+        get :filter_starter, on: :collection
+        get :filter_basic, on: :collection
+        get :filter_advance, on: :collection
       end
         resources :works, only: [:index, :update, :create, :destroy]
         resources :posts, only: [:create, :index, :update, :destroy, :show] do

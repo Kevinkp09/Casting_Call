@@ -12,11 +12,7 @@ class Api::V1::PostsController < ApplicationController
     requests = @post.requests.order(created_at: :desc).map{|r| r.attributes.merge({user: r.user})}
     user = current_user
     package = user.package
-    if package.name == "starter"
-      render json: {requests: requests, message: "This is the limit."}, status: :ok
-    else
-      render json: requests, status: :ok
-    end
+      render json: {requests: requests.first(package.requests_limit), message: "This is the limit."}, status: :ok
   end
 
   def show_posts
@@ -39,7 +35,7 @@ class Api::V1::PostsController < ApplicationController
     post.agency = user
 
     if post.save
-      render json: { id: post.id, message: "Post added successfully" }, status: :created
+      render json: { id: post.id, message: "Post added successfully", script: post.script.attached? ? url_for(post.script) : '' }, status: :created
     else
       render json: { error: post.errors.full_messages }, status: :unprocessable_entity
     end

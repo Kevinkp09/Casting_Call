@@ -29,7 +29,7 @@ class Api::V1::PackagesController < ApplicationController
       render json: {error: "You are not authorized for this action"}, status: :unauthorized
     end
   end
-
+  
   private
   def package_params
     params.require(:package).permit(:name, :price, :posts_limit, :requests_limit)
