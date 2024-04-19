@@ -38,6 +38,7 @@ Rails.application.routes.draw do
           put :reject_artist, on: :member
        end
        resources :packages
+       resources :payments
     end
   end
 end
