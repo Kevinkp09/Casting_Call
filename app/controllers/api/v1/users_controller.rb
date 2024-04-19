@@ -187,7 +187,7 @@ class Api::V1::UsersController < ApplicationController
 
   def check_admin
     unless current_user && current_user.role == "admin"
-      render json: {error: "You are unauthorized"}, status: :unprocessable_entity
+      render json: {error: "You are unauthorized"}, status: :unauthorized
     end
   end
 end

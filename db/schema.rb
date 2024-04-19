@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_04_17_112942) do
+ActiveRecord::Schema[7.1].define(version: 2024_04_19_085023) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -79,6 +79,16 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_17_112942) do
     t.integer "requests_limit"
   end
 
+  create_table "payments", force: :cascade do |t|
+    t.integer "agency_id"
+    t.integer "package_id"
+    t.string "razorpay_order_id"
+    t.string "razorpay_payment_id"
+    t.string "status_type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "posts", force: :cascade do |t|
     t.string "title"
     t.string "age"
@@ -89,6 +99,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_17_112942) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "agency_id"
+    t.integer "audition_type", default: 0
   end
 
   create_table "requests", force: :cascade do |t|

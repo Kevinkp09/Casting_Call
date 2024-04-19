@@ -1,6 +1,6 @@
 class Api::V1::PostsController < ApplicationController
   before_action :set_post, only: [:update, :destroy, :show]
-
+  before_action :check_agency, only: [:create, :destroy, :show, :show_posts]
   def index
     if current_user.role == "artist"
       posts = Post.all.order(created_at: :desc)
@@ -13,7 +13,7 @@ class Api::V1::PostsController < ApplicationController
     user = current_user
     package = user.package
     if package.name == "starter"
-      render json: {requests: requests.last(5).reverse, message: "This is the limit."}, status: :ok
+      render json: {requests: requests, message: "This is the limit."}, status: :ok
     else
       render json: requests, status: :ok
     end
@@ -67,7 +67,7 @@ class Api::V1::PostsController < ApplicationController
 
   private
   def post_params
-    params.require(:post).permit(:title, :age, :location, :description, :role, :category)
+    params.require(:post).permit(:title, :age, :location, :description, :role, :category, :audition_type, :script)
   end
 
   def set_post
@@ -78,4 +78,9 @@ class Api::V1::PostsController < ApplicationController
     end
   end
 
+  def check_agency
+    unless current_user && current_user.role == "agency"
+      render json: {error: "You are unauthorized"}, status: :unauthorized
+    end
+  end
 end
