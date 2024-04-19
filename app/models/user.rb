@@ -8,7 +8,7 @@ class User < ApplicationRecord
   enum approval_status: {pending: 0, approved: 1, rejected: 2}
          VALID_MOBILE_REGEX = /\A\d{10}\z/
   has_one_attached :profile_photo
-  has_one :package
+  belongs_to :package, class_name: "Package", foreign_key: "package_id", optional: true
   has_many :works
   has_many :requests
   has_many :posts, through: :requests

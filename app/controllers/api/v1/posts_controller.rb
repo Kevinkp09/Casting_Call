@@ -1,5 +1,4 @@
 class Api::V1::PostsController < ApplicationController
-  before_action :approved_agency, only: [:create, :show_posts]
   before_action :set_post, only: [:update, :destroy, :show]
 
   def index
@@ -11,7 +10,13 @@ class Api::V1::PostsController < ApplicationController
 
   def show
     requests = @post.requests.order(created_at: :desc).map{|r| r.attributes.merge({user: r.user})}
-    render json: requests, status: :ok
+    user = current_user
+    package = user.package
+    if package.name == "starter"
+      render json: {requests: requests.last(5).reverse, message: "This is the limit."}, status: :ok
+    else
+      render json: requests, status: :ok
+    end
   end
 
   def show_posts
@@ -24,12 +29,19 @@ class Api::V1::PostsController < ApplicationController
   end
 
   def create
+    user = current_user
+    package = user.package
+    if user.posts.count >= package.posts_limit
+      render json: { error: "You need to upgrade your package to create more posts" }, status: :unprocessable_entity
+      return
+    end
     post = Post.new(post_params)
-    post.agency = current_user
+    post.agency = user
+
     if post.save
-      render json: {id: post.id, message: "Post added successfully"}, status: :ok
+      render json: { id: post.id, message: "Post added successfully" }, status: :created
     else
-      render json: {error: post.errors.full_messages}, status: :unprocessable_entity
+      render json: { error: post.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
@@ -66,9 +78,4 @@ class Api::V1::PostsController < ApplicationController
     end
   end
 
-  def approved_agency
-     unless current_user.role == "agency" && current_user.approval_status == "approved"
-       render json: {error: "You are not authorized for this action"}, status: :unauthorized
-     end
-  end
 end

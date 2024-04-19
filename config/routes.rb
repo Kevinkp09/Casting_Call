@@ -25,6 +25,8 @@ Rails.application.routes.draw do
         get :view_requests, on: :collection
         get :show_approved_agencies, on: :collection
         get :show_registered_artist, on: :collection
+        put :upgrade_basic, on: :collection
+        put :upgrade_advance, on: :collection
       end
         resources :works, only: [:index, :update, :create, :destroy]
         resources :posts, only: [:create, :index, :update, :destroy, :show] do
@@ -35,10 +37,7 @@ Rails.application.routes.draw do
           put :approve_artist, on: :member
           put :reject_artist, on: :member
        end
-       resources :packages do
-         put :upgrade_basic, on: :member
-         put :upgrade_advance, on: :member
-       end
+       resources :packages
     end
   end
 end

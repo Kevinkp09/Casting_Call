@@ -4,11 +4,11 @@ class Api::V1::UsersController < ApplicationController
 
   def create
     user = User.new(user_params)
-    client_app = Doorkeeper::Application.find_by(uid: params[:client_id])
-    return render(json: { error: 'Invalid client ID'}, status: 403) unless client_app
     if user.role == "agency"
       user.package = Package.find_or_create_by(name: "starter")
     end
+    client_app = Doorkeeper::Application.find_by(uid: params[:client_id])
+    return render(json: { error: 'Invalid client ID'}, status: 403) unless client_app
     if user.save
       # create access token for the user, so the user won't need to login again after registration
       access_token = Doorkeeper::AccessToken.create(
@@ -130,8 +130,8 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def show_approved_agencies
-    user = User.where(approval_status: :approved, role: :agency)
-    render json: user, status: :ok
+    users = User.where(role: :agency).map { |user| { user: user, package_name: user.package&.name } }
+    render json: users, status: :ok
   end
 
   def show_registered_artist
@@ -139,6 +139,33 @@ class Api::V1::UsersController < ApplicationController
     render json: user, status: :ok
   end
 
+  def upgrade_basic
+    user = current_user
+    package = user.package
+    if user.role == "agency"
+      if package && package.name == "starter" && package.update(name: "basic", posts_limit: 5, requests_limit: nil)
+        render json: { message: "Your package has been updated to basic successfully" }, status: :ok
+      else
+        render json: { error: package.errors.full_messages }, status: :unprocessable_entity
+      end
+    else
+      render json: {error: "You are unauthorized for this action"}, status: :unauthorized
+    end
+  end
+
+  def upgrade_advance
+    if user.role == "agency"
+      user = current_user
+      package = user.package
+      if (package.name == "starter" || package.name == "basic") && package.update(name: "advance", posts_limit: nil, requests_limit: nil)
+        render json: {message: "Your package has been updated to advance successfully"}, status: :ok
+      else
+        render json: {error: package.errors.full_messages}, status: unprocessable_entity
+      end
+    else
+      render json: {error: "You are unauthorized for this action"}, status: :unauthorized
+    end
+  end
   private
 
   def user_params

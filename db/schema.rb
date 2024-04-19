@@ -10,7 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_04_16_120727) do
+ActiveRecord::Schema[7.1].define(version: 2024_04_17_112942) do
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
+
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -40,8 +43,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_16_120727) do
   end
 
   create_table "oauth_access_tokens", force: :cascade do |t|
-    t.integer "resource_owner_id"
-    t.integer "application_id", null: false
+    t.bigint "resource_owner_id"
+    t.bigint "application_id", null: false
     t.string "token", null: false
     t.string "refresh_token"
     t.integer "expires_in"
@@ -72,7 +75,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_16_120727) do
     t.decimal "price", precision: 8, scale: 2
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "agency_id"
     t.integer "posts_limit"
     t.integer "requests_limit"
   end
@@ -93,8 +95,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_16_120727) do
     t.integer "status", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "user_id", null: false
-    t.integer "post_id", null: false
+    t.bigint "user_id", null: false
+    t.bigint "post_id", null: false
     t.index ["post_id"], name: "index_requests_on_post_id"
     t.index ["user_id"], name: "index_requests_on_user_id"
   end
@@ -117,6 +119,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_16_120727) do
     t.string "otp"
     t.datetime "otp_generated_time"
     t.integer "approval_status", default: 0
+    t.integer "package_id"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
@@ -137,5 +140,4 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_16_120727) do
   add_foreign_key "oauth_access_tokens", "oauth_applications", column: "application_id"
   add_foreign_key "requests", "posts"
   add_foreign_key "requests", "users"
-  add_foreign_key "works", "users"
 end

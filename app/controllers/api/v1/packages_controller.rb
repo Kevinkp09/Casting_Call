@@ -1,7 +1,7 @@
 class Api::V1::PackagesController < ApplicationController
   def index
-    packages = Package.all
-    render json: {packages: packages, message: "All packages showing"}, status: :ok
+    packages = Package.all.order(:price)
+    render json: packages, status: :ok
   end
 
   def update
@@ -30,28 +30,8 @@ class Api::V1::PackagesController < ApplicationController
     end
   end
 
-  def upgrade_basic
-    user = current_user
-    package = user.package
-    if package.name == "starter" && package.update(name: "basic", posts_limit: 5, requests_limit: nil)
-      render json: { message: "Your package has been updated to basic successfully" }, status: :ok
-    else
-      render json: { error: package.errors.full_messages }, status: :unprocessable_entity
-    end
-  end
-
-  def upgrade_advance
-    user = current_user
-    package = user.package
-    if (package.name == "starter" || package.name == "basic") && package.update(name: "advance", posts_limit: nil, requests_limit: nil)
-      render json: {message: "Your package has been updated to advance successfully"}, status: :ok
-    else
-      render json: {error: package.errors.full_messages}, status: unprocessable_entity
-    end
-  end
-
   private
   def package_params
-    params.require(:package).permit(:name, :price)
+    params.require(:package).permit(:name, :price, :posts_limit, :requests_limit)
   end
 end
