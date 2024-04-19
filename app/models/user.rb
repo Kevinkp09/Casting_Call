@@ -10,6 +10,7 @@ class User < ApplicationRecord
   has_one_attached :profile_photo
   belongs_to :package, class_name: "Package", foreign_key: "package_id", optional: true
   has_many :works
+  has_many :payments
   has_many :requests
   has_many :posts, through: :requests
   has_many :posts, foreign_key: 'agency_id'
