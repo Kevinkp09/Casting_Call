@@ -3,7 +3,7 @@ class Api::V1::PaymentsController < ApplicationController
   def create
     user = User.find_by(id: payment_params[:agency_id])
     if user.present?
-      package = Package.find_by(name: payment_params[:package_name])
+      package = Package.find_by(name: payment_params[:package_name].strip.downcase)
       if package.present?
         amount = package.price.to_i * 100
         razorpay_order = Razorpay::Order.create(amount: amount, currency: 'INR')

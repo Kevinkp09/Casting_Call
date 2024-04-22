@@ -6,6 +6,7 @@ class Api::V1::RequestsController < ApplicationController
     if current_user.role == "artist"
       request = @post.requests.new(user: current_user)
       if request.save
+        request.update(apply_status: :applied)
         render json: request, status: :created
       else
         render json: {error: request.errors.full_messages}, status: :unprocessable_entity
@@ -33,7 +34,7 @@ class Api::V1::RequestsController < ApplicationController
 
   private
   def request_params
-    params.require(:request).permit(:status)
+    params.require(:request).permit(:status, :apply_status)
   end
 
   def set_post
