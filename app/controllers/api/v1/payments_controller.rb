@@ -3,7 +3,7 @@ class Api::V1::PaymentsController < ApplicationController
   def create
     user = User.find_by(id: payment_params[:agency_id])
     if user.present?
-      package = Package.find_by(name: payment_params[:package_name])
+      package = Package.find_by(name: payment_params[:package_name].strip.downcase)
       if package.present?
         amount = package.price.to_i * 100
         razorpay_order = Razorpay::Order.create(amount: amount, currency: 'INR')
@@ -45,10 +45,10 @@ class Api::V1::PaymentsController < ApplicationController
       @payment = Payment.find_by(razorpay_order_id: order_id)
       if @payment.present?
         @payment.update(status_type: 'paid', razorpay_payment_id: payment_id)
-        @user = @payment.user
+        @user = @payment.agency
         if @user.present?
           @user.update(package: @payment.package)
-          UserMailer.payment_success_email(@user, @payment.package).deliver_later
+          # UserMailer.payment_success_email(@user, @payment.package).deliver_later
         else
           render json: {message: "User not found"}, status: :not_found
         end

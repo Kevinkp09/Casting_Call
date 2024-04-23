@@ -1,10 +1,27 @@
 class Api::V1::PostsController < ApplicationController
-  before_action :set_post, only: [:update, :destroy, :show]
+  before_action :set_post, only: [:update, :destroy, :show, :preview_post]
   before_action :check_agency, only: [:create, :destroy, :show, :show_posts]
   def index
     if current_user.role == "artist"
       posts = Post.all.order(created_at: :desc)
-      render json: posts, status: :ok
+      posts_data = posts.map do |post|
+        request_status = current_user.requests.find_by(post_id: post.id)&.apply_status || ''
+        approval_status = current_user.requests.find_by(post_id: post.id)&.status || ''
+        {
+          id: post.id,
+          title: post.title,
+          description: post.description,
+          audition_type: post.audition_type,
+          age: post.age,
+          location: post.location,
+          role: post.role,
+          category: post.category,
+          approval_status: approval_status,
+          apply_status: request_status,
+          script: post.script.attached? ? url_for(post.script) : ''
+        }
+      end
+      render json: { posts: posts_data }, status: :ok
     end
   end
 
@@ -12,19 +29,32 @@ class Api::V1::PostsController < ApplicationController
     requests = @post.requests.order(created_at: :desc).map{|r| r.attributes.merge({user: r.user})}
     user = current_user
     package = user.package
-    if package.name == "starter"
-      render json: {requests: requests, message: "This is the limit."}, status: :ok
-    else
-      render json: requests, status: :ok
-    end
+    render json: {requests: requests.first(package.requests_limit), message: "This is the limit."}, status: :ok
+  end
+
+  def preview_post
+    render @post, status: :ok
   end
 
   def show_posts
     if params[:agency_id].present?
       posts = Post.where(agency_id: params[:agency_id]).order(created_at: :desc)
-      render json: posts, status: :ok
+      posts_data = posts.map do |post|
+        {
+          id: post.id,
+          title: post.title,
+          description: post.description,
+          audition_type: post.audition_type,
+          age: post.age,
+          location: post.location,
+          role: post.role,
+          category: post.category,
+          script: post.script.attached? ? url_for(post.script) : ''
+        }
+      end
+      render json: { posts: posts_data }, status: :ok
     else
-      render json: {error: "Not found"}, status: 404
+      render json: { error: "Agency ID not provided" }, status: :unprocessable_entity
     end
   end
 
@@ -39,7 +69,7 @@ class Api::V1::PostsController < ApplicationController
     post.agency = user
 
     if post.save
-      render json: { id: post.id, message: "Post added successfully" }, status: :created
+      render json: { id: post.id, message: "Post added successfully", script: post.script.attached? ? url_for(post.script) : '' }, status: :created
     else
       render json: { error: post.errors.full_messages }, status: :unprocessable_entity
     end

@@ -27,18 +27,25 @@ Rails.application.routes.draw do
         get :show_registered_artist, on: :collection
         put :upgrade_basic, on: :collection
         put :upgrade_advance, on: :collection
+        get :find_user
+        get :filter_starter, on: :collection
+        get :filter_basic, on: :collection
+        get :filter_advance, on: :collection
       end
         resources :works, only: [:index, :update, :create, :destroy]
         resources :posts, only: [:create, :index, :update, :destroy, :show] do
           get :view_applied_artist, on: :collection
           get :show_posts, on: :collection
        end
-       resources :requests, only: [:create] do
+       resources :requests, only: [:create, :index] do
           put :approve_artist, on: :member
           put :reject_artist, on: :member
+          get :filter_shortlisted, on: :collection 
        end
        resources :packages
-       resources :payments
+       resources :payments do
+         post :callback, on: :collection
+       end
     end
   end
 end
