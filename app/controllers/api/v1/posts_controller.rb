@@ -1,5 +1,5 @@
 class Api::V1::PostsController < ApplicationController
-  before_action :set_post, only: [:update, :destroy, :show]
+  before_action :set_post, only: [:update, :destroy, :show, :preview_post]
   before_action :check_agency, only: [:create, :destroy, :show, :show_posts]
   def index
     if current_user.role == "artist"
@@ -29,7 +29,11 @@ class Api::V1::PostsController < ApplicationController
     requests = @post.requests.order(created_at: :desc).map{|r| r.attributes.merge({user: r.user})}
     user = current_user
     package = user.package
-      render json: {requests: requests.first(package.requests_limit), message: "This is the limit."}, status: :ok
+    render json: {requests: requests.first(package.requests_limit), message: "This is the limit."}, status: :ok
+  end
+
+  def preview_post
+    render @post, status: :ok
   end
 
   def show_posts

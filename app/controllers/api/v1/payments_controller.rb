@@ -45,10 +45,10 @@ class Api::V1::PaymentsController < ApplicationController
       @payment = Payment.find_by(razorpay_order_id: order_id)
       if @payment.present?
         @payment.update(status_type: 'paid', razorpay_payment_id: payment_id)
-        @user = @payment.user
+        @user = @payment.agency
         if @user.present?
           @user.update(package: @payment.package)
-          UserMailer.payment_success_email(@user, @payment.package).deliver_later
+          # UserMailer.payment_success_email(@user, @payment.package).deliver_later
         else
           render json: {message: "User not found"}, status: :not_found
         end

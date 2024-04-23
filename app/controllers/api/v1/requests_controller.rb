@@ -16,6 +16,19 @@ class Api::V1::RequestsController < ApplicationController
     end
   end
 
+  def filter_shortlisted
+    user = current_user
+    posts = user.posts
+    shortlisted_requests = []
+    posts.each do |post|
+        shortlisted_requests.concat(post.requests.where(status: :shortlisted)).map do |request|
+        request.attributes.merge(user: request.user)
+      end
+    end
+    render json: shortlisted_requests, status: :ok
+  end
+
+
   def approve_artist
     if @request.update(status: :shortlisted)
       render json: {message: "Request is shortlisted", id: @request.id, status: @request.status}, status: :ok
