@@ -31,7 +31,7 @@ Rails.application.routes.draw do
         get :filter_starter, on: :collection
         get :filter_basic, on: :collection
         get :filter_advance, on: :collection
-        get :credential
+        get :credential, on: :collection
       end
         resources :works, only: [:index, :update, :create, :destroy]
         resources :posts, only: [:create, :index, :update, :destroy, :show] do
