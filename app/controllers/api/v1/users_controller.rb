@@ -1,5 +1,5 @@
 class Api::V1::UsersController < ApplicationController
-    skip_before_action :doorkeeper_authorize!, only: %i[create login verify_otp]
+    skip_before_action :doorkeeper_authorize!, only: %i[create login verify_otp credential]
     before_action :check_admin, only: [:view_requests, :reject_request ,:show_approved_agencies, :show_registered_artist]
 
   def create
@@ -37,6 +37,11 @@ class Api::V1::UsersController < ApplicationController
     else
       render json: { error: 'Invalid user. Please check the provided information.', full_messages: user.errors.full_messages }, status: 422
     end
+  end
+
+  def credential
+    client_id = Doorkeeper::Application.last.uid
+    render json: client_id, status: :ok
   end
 
   def login

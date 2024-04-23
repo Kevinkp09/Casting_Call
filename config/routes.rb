@@ -31,6 +31,7 @@ Rails.application.routes.draw do
         get :filter_starter, on: :collection
         get :filter_basic, on: :collection
         get :filter_advance, on: :collection
+        get :credential
       end
         resources :works, only: [:index, :update, :create, :destroy]
         resources :posts, only: [:create, :index, :update, :destroy, :show] do
@@ -40,7 +41,7 @@ Rails.application.routes.draw do
        resources :requests, only: [:create, :index] do
           put :approve_artist, on: :member
           put :reject_artist, on: :member
-          get :filter_shortlisted, on: :collection 
+          get :filter_shortlisted, on: :collection
        end
        resources :packages
        resources :payments do
