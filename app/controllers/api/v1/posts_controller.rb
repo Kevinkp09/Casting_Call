@@ -1,5 +1,5 @@
 class Api::V1::PostsController < ApplicationController
-  before_action :set_post, only: [:update, :destroy, :show, :preview_post]
+  before_action :set_post, only: [:update, :destroy, :show]
   before_action :check_agency, only: [:create, :destroy, :show, :show_posts]
   def index
     if current_user.role == "artist"
@@ -26,14 +26,7 @@ class Api::V1::PostsController < ApplicationController
   end
 
   def show
-    requests = @post.requests.order(created_at: :desc).map{|r| r.attributes.merge({user: r.user})}
-    user = current_user
-    package = user.package
-    render json: {requests: requests.first(package.requests_limit), message: "This is the limit."}, status: :ok
-  end
-
-  def preview_post
-    render @post, status: :ok
+   render json: @post, status: :ok
   end
 
   def show_posts
@@ -61,7 +54,7 @@ class Api::V1::PostsController < ApplicationController
   def create
     user = current_user
     package = user.package
-    if user.posts.count >= package.posts_limit
+    if user.posts.count >= package.posts_limit.to_i
       render json: { error: "You need to upgrade your package to create more posts" }, status: :unprocessable_entity
       return
     end

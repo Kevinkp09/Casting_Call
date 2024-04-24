@@ -2,6 +2,13 @@ class Api::V1::RequestsController < ApplicationController
   before_action :set_post, only: [:create]
   before_action :check_request_status, only: [:approve_artist, :reject_artist]
 
+  def index
+    user = current_user
+    package = user.package
+    requests = user.posts.map { |post| post.requests.order(created_at: :desc).map { |r| r.attributes.merge({ user: r.user }) } }.flatten
+    render json: { requests: requests.first(package.requests_limit), message: "This is the limit." }, status: :ok
+  end
+
   def create
     if current_user.role == "artist"
       request = @post.requests.new(user: current_user)
@@ -18,11 +25,9 @@ class Api::V1::RequestsController < ApplicationController
 
   def filter_shortlisted
     user = current_user
-    posts = user.posts
-    shortlisted_requests = []
-    posts.each do |post|
-        shortlisted_requests.concat(post.requests.where(status: :shortlisted)).map do |request|
-        request.attributes.merge(user: request.user)
+    shortlisted_requests = user.posts.map do |post|
+      post.requests.where(status: :shortlisted).map do |r|
+        r.attributes.merge(user: r.user)
       end
     end
     render json: shortlisted_requests, status: :ok
