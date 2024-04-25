@@ -99,6 +99,9 @@ class Api::V1::UsersController < ApplicationController
       category: user.category,
       birth_date: user.birth_date,
       current_location: user.current_location,
+      skin_color: user.skin_color,
+      height: user.height,
+      weight: user.weight,
       profile_photo: user.profile_photo.attached? ? url_for(user.profile_photo) : ''
       }
     }, status: :ok
@@ -186,14 +189,36 @@ class Api::V1::UsersController < ApplicationController
     render json: starter_users, status: :ok
   end
 
-   def filter_basic
+  def filter_basic
     basic_users = User.includes(:package).where(packages: {name: "basic"})
     render json: basic_users, status: :ok
   end
 
-   def filter_advance
+  def filter_advance
     advance_users = User.includes(:package).where(packages: {name: "advance"})
     render json: advance_users, status: :ok
+  end
+
+  def view_profile
+    user = User.find(params[:user_id])
+    works = user.works
+    render json:{
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        skin_color: user.skin_color,
+        height: user.height,
+        weight: user.weight,
+        gender: user.gender,
+        category: user.category,
+        birth_date: user.birth_date,
+        current_location: user.current_location,
+        profile_photo: user.profile_photo.attached? ? url_for(user.profile_photo) : ''
+      }, works: works.map{|work| work.attributes}
+    }, status: :ok
+
   end
   private
 
@@ -202,7 +227,7 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def personal_params
-    params.require(:user).permit(:gender, :category, :birth_date, :current_location, :profile_photo)
+    params.require(:user).permit(:gender, :category, :birth_date, :current_location, :profile_photo, :skin_color, :height, :weight)
   end
 
   def generate_refresh_token

@@ -5,7 +5,21 @@ class Api::V1::RequestsController < ApplicationController
   def index
     user = current_user
     package = user.package
-    requests = user.posts.map { |post| post.requests.order(created_at: :desc).map { |r| r.attributes.merge({ user: r.user }) } }.flatten
+    requests = user.posts.map do |post|
+      post.requests.order(created_at: :desc).map do |r|
+        if package.name == "starter"
+          {
+            id: r.user.id,
+            user_name: r.user.username,
+            category: r.user.category,
+            location: r.user.current_location,
+            gender: r.user.gender
+          }
+        else
+          r.attributes.merge({ user: r.user })
+        end
+      end
+    end.flatten
     render json: { requests: requests.first(package.requests_limit), message: "This is the limit." }, status: :ok
   end
 
