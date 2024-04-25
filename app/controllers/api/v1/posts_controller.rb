@@ -19,6 +19,8 @@ class Api::V1::PostsController < ApplicationController
           skin_color: post.skin_color,
           weight: post.weight,
           height: post.height,
+          date: post.date,
+          time: post.time,
           approval_status: approval_status,
           apply_status: request_status,
           script: post.script.attached? ? url_for(post.script) : ''
@@ -48,6 +50,8 @@ class Api::V1::PostsController < ApplicationController
           skin_color: post.skin_color,
           weight: post.weight,
           height: post.height,
+          date: post.date,
+          time: post.time,
           script: post.script.attached? ? url_for(post.script) : ''
         }
       end
@@ -66,7 +70,6 @@ class Api::V1::PostsController < ApplicationController
     end
     post = Post.new(post_params)
     post.agency = user
-
     if post.save
       render json: { id: post.id, message: "Post added successfully", script: post.script.attached? ? url_for(post.script) : '' }, status: :created
     else
@@ -96,7 +99,7 @@ class Api::V1::PostsController < ApplicationController
 
   private
   def post_params
-    params.require(:post).permit(:title, :age, :location, :description, :role, :category, :audition_type, :script, :skin_color, :height, :weight)
+    params.require(:post).permit(:title, :age, :location, :description, :role, :category, :audition_type, :script, :skin_color, :height, :weight, :date, :time)
   end
 
   def set_post
