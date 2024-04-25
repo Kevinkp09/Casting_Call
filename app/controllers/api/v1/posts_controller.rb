@@ -16,6 +16,9 @@ class Api::V1::PostsController < ApplicationController
           location: post.location,
           role: post.role,
           category: post.category,
+          skin_color: post.skin_color,
+          weight: post.weight,
+          height: post.height,
           approval_status: approval_status,
           apply_status: request_status,
           script: post.script.attached? ? url_for(post.script) : ''
@@ -42,6 +45,9 @@ class Api::V1::PostsController < ApplicationController
           location: post.location,
           role: post.role,
           category: post.category,
+          skin_color: post.skin_color,
+          weight: post.weight,
+          height: post.height,
           script: post.script.attached? ? url_for(post.script) : ''
         }
       end
@@ -90,7 +96,7 @@ class Api::V1::PostsController < ApplicationController
 
   private
   def post_params
-    params.require(:post).permit(:title, :age, :location, :description, :role, :category, :audition_type, :script)
+    params.require(:post).permit(:title, :age, :location, :description, :role, :category, :audition_type, :script, :skin_color, :height, :weight)
   end
 
   def set_post
