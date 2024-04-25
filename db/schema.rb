@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_04_25_062107) do
+ActiveRecord::Schema[7.1].define(version: 2024_04_25_115202) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -103,6 +103,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_25_062107) do
     t.integer "skin_color", default: 0
     t.decimal "height", precision: 5, scale: 2
     t.decimal "weight", precision: 5, scale: 2
+    t.date "date"
+    t.time "time"
   end
 
   create_table "requests", force: :cascade do |t|
