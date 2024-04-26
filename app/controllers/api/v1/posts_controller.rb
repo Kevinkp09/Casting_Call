@@ -35,6 +35,28 @@ class Api::V1::PostsController < ApplicationController
    render json: @post, status: :ok
   end
 
+  def show_requests
+    user = current_user
+    package = user.package
+    @post = Post.find(params[:post_id])
+    requests = @post.requests.order(id: :asc).map do |r|
+      if package.name == "starter"
+          {
+            id: @post.id,
+            username: r.user.username,
+            category: r.user.category,
+            location: r.user.current_location,
+            gender: r.user.gender,
+            status: r.status
+          }
+      else
+        r.attributes.merge({ user: r.user })
+      end
+    end
+    requests = requests.take(package.requests_limit) unless package.requests_limit.nil?
+    render json: {requests: requests, message: "This is the limit."}, status: :ok
+  end
+
   def show_posts
     if params[:agency_id].present?
       posts = Post.where(agency_id: params[:agency_id]).order(created_at: :desc)
