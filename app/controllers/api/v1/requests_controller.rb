@@ -20,7 +20,7 @@ class Api::V1::RequestsController < ApplicationController
         end
       end
     end.flatten
-    requests = requests.first(package.requests_limit) unless package.requests_limit.nil?
+    requests = requests.take(package.requests_limit) unless package.requests_limit.nil?
     render json: { requests: requests, message: "This is the limit." }, status: :ok
   end
 
