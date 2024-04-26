@@ -9,7 +9,7 @@ class Api::V1::PostsController < ApplicationController
         approval_status = current_user.requests.find_by(post_id: post.id)&.status || ''
         {
           id: post.id,
-          name: post.agency.username,
+          name: post.agency&.username || '',
           title: post.title,
           description: post.description,
           audition_type: post.audition_type,

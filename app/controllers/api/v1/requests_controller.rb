@@ -1,15 +1,14 @@
 class Api::V1::RequestsController < ApplicationController
   before_action :set_post, only: [:create]
   before_action :check_request_status, only: [:approve_artist, :reject_artist]
-
   def index
     user = current_user
     package = user.package
     requests = user.posts.map do |post|
-      post.requests.order(created_at: :desc).map do |r|
+      post.requests.order(id: :asc).map do |r|
         if package.name == "starter"
           {
-            id: r.user.id,
+            id: r.id,
             username: r.user.username,
             category: r.user.category,
             location: r.user.current_location,
@@ -41,8 +40,19 @@ class Api::V1::RequestsController < ApplicationController
 
   def filter_shortlisted
     user = current_user
+    package = user.package
     shortlisted_requests = user.posts.map do |post|
       post.requests.where(status: :shortlisted).map do |r|
+        if package.name == "starter"
+           {
+            id: r.user.id,
+            username: r.user.username,
+            category: r.user.category,
+            location: r.user.current_location,
+            gender: r.user.gender,
+            status: r.status
+          }
+        end
         r.attributes.merge(user: r.user)
       end
     end
@@ -80,7 +90,7 @@ class Api::V1::RequestsController < ApplicationController
   end
 
   def check_request_status
-    @request = Request.find(params[:id])
+    @request = Request.find_by(id: params[:id])
     if @request.nil?
       render json: {message: "Request not found"}, status: 404
       return
