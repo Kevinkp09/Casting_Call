@@ -38,6 +38,7 @@ Rails.application.routes.draw do
         resources :posts, only: [:create, :index, :update, :destroy, :show] do
           get :view_applied_artist, on: :collection
           get :show_posts, on: :collection
+          get :show_requests
        end
        resources :requests, only: [:create, :index] do
           put :approve_artist, on: :member
