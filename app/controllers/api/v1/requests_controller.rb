@@ -13,7 +13,8 @@ class Api::V1::RequestsController < ApplicationController
             username: r.user.username,
             category: r.user.category,
             location: r.user.current_location,
-            gender: r.user.gender
+            gender: r.user.gender,
+            status: r.status
           }
         else
           r.attributes.merge({ user: r.user })
