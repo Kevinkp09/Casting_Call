@@ -10,7 +10,7 @@ class Api::V1::RequestsController < ApplicationController
         if package.name == "starter"
           {
             id: r.user.id,
-            user_name: r.user.username,
+            username: r.user.username,
             category: r.user.category,
             location: r.user.current_location,
             gender: r.user.gender
@@ -20,7 +20,8 @@ class Api::V1::RequestsController < ApplicationController
         end
       end
     end.flatten
-    render json: { requests: requests.first(package.requests_limit), message: "This is the limit." }, status: :ok
+    requests = requests.first(package.requests_limit) unless package.requests_limit.nil?
+    render json: { requests: requests, message: "This is the limit." }, status: :ok
   end
 
   def create
