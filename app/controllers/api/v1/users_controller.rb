@@ -135,12 +135,16 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def reject_request
-    user = User.find_by(id: params[:user][:id])
+    user = User.find(params[:user_id])
+
+    binding.pry
+
     if user.approval_status == "approved" || user.approval_status == "rejected"
       render json: {error: "User is already approved or rejected, it can't be done again"}, status: :unprocessable_entity
     end
     if user.update(approval_status: :rejected)
-      render json: user, status: :ok
+      user.destroy
+      render json: {message: "Agency successfully rejected and removed."}, status: :ok
     else
       render json: {error: user.errors.full_messages}, status: :unprocessable_entity
     end

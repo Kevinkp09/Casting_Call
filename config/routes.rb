@@ -21,7 +21,7 @@ Rails.application.routes.draw do
         put :add_details, on: :collection
         post :verify_otp, on: :collection
         put :approve_request, on: :collection
-        put :reject_request, on: :collection
+        put :reject_request
         get :view_requests, on: :collection
         get :show_approved_agencies, on: :collection
         get :show_registered_artist, on: :collection
