@@ -34,4 +34,25 @@ RSpec.describe User, type: :model do
       expect(subject).to_not be_valid
     end
   end
+  describe "associations" do
+    it "should have one attached profile photo" do
+      expect(User.new).to respond_to(:profile_photo)
+    end
+
+    it "should belong to a package" do
+      expect(User.reflect_on_association(:package).macro).to eq(:belongs_to)
+    end
+
+    it "should have many works" do
+      expect(User.reflect_on_association(:works).macro).to eq(:has_many)
+    end
+
+    it "should have many payments" do
+      expect(User.reflect_on_association(:payments).macro).to eq(:has_many)
+    end
+
+    it "should have many requests" do
+      expect(User.reflect_on_association(:requests).macro).to eq(:has_many)
+    end
+  end
 end

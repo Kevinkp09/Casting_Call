@@ -126,7 +126,7 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def view_requests
-    all_requests = User.where(approval_status: [:pending, :rejected], role: :agency).order(created_at: :desc)
+    all_requests = User.where(approval_status: [:approved, :rejected], role: :agency).order(created_at: :desc)
     if all_requests
      render json: all_requests, status: :ok
     else
@@ -136,11 +136,8 @@ class Api::V1::UsersController < ApplicationController
 
   def reject_request
     user = User.find(params[:user_id])
-
-    binding.pry
-
-    if user.approval_status == "approved" || user.approval_status == "rejected"
-      render json: {error: "User is already approved or rejected, it can't be done again"}, status: :unprocessable_entity
+    if user.approval_status == "rejected"
+      render json: {error: "User is already rejected, it can't be done again"}, status: :unprocessable_entity
     end
     if user.update(approval_status: :rejected)
       user.destroy
@@ -224,10 +221,32 @@ class Api::V1::UsersController < ApplicationController
     }, status: :ok
 
   end
+
+  def forgot
+    user = User.find_by(email: params[:email])
+    if user
+      otp = generate_otp
+      user.update(otp: otp)
+      UserMailer.forgot_password_email(user, otp).deliver_now
+      render json: { message: "OTP has been sent to your email" }, status: :ok
+    else
+      render json: { error: "User not found" }, status: :not_found
+    end
+  end
+
+  def reset
+    user = User.find_by(email: params[:email])
+    if user && user.otp == params[:otp]
+      user.update(password: params[:password], otp: nil)
+      render json: { message: "Password reset successfully" }, status: :ok
+    else
+      render json: { error: "Invalid OTP" }, status: :unprocessable_entity
+    end
+  end
   private
 
   def user_params
-    params.require(:user).permit(:email, :password, :username, :mobile_no, :role, :otp)
+    params.require(:user).permit(:email, :password, :username, :mobile_no, :role, :otp, :posts_count)
   end
 
   def personal_params
@@ -247,5 +266,9 @@ class Api::V1::UsersController < ApplicationController
     unless current_user && current_user.role == "admin"
       render json: {error: "You are unauthorized"}, status: :unauthorized
     end
+  end
+
+  def generate_otp
+    rand.to_s[2..5]
   end
 end

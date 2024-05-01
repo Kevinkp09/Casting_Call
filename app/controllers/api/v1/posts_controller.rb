@@ -87,7 +87,7 @@ class Api::V1::PostsController < ApplicationController
   def create
     user = current_user
     package = user.package
-    if user.posts.count >= package.posts_limit.to_i
+    if user.posts_count >= package.posts_limit
       render json: { error: "You need to upgrade your package to create more posts" }, status: :unprocessable_entity
       return
     end
