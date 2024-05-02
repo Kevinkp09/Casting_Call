@@ -5,8 +5,8 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable,
          :omniauthable, omniauth_providers: [:google_oauth2]
   enum role: {artist: 0, agency: 1, admin: 2}
-  enum approval_status: {pending: 0, approved: 1, rejected: 2}
-  enum skin_color: {fair: 0, light: 1, dark: 2} 
+  enum approval_status: {approved: 0, rejected: 1}
+  enum skin_color: {fair: 0, light: 1, dark: 2}
          VALID_MOBILE_REGEX = /\A\d{10}\z/
   has_one_attached :profile_photo
   belongs_to :package, class_name: "Package", foreign_key: "package_id", optional: true

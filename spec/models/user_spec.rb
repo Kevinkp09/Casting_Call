@@ -34,4 +34,13 @@ RSpec.describe User, type: :model do
       expect(subject).to_not be_valid
     end
   end
+  describe "associations" do
+    it { should belong_to(:package).class_name('Package').with_foreign_key(:package_id).optional }
+    it { should have_many(:works) }
+    it { should have_many(:requests) }
+    it { should have_many(:posts).with_foreign_key(:agency_id) }
+    it { should have_one_attached(:profile_photo) }
+    it {should define_enum_for(:role).with_values(artist: 0, agency: 1, admin: 2) }
+    it {should define_enum_for(:skin_color).with_values(fair: 0, light: 1, dark: 2) }
+  end
 end

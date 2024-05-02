@@ -50,10 +50,11 @@ class Api::V1::RequestsController < ApplicationController
             category: r.user.category,
             location: r.user.current_location,
             gender: r.user.gender,
-            status: r.status
+            status: r.status,
+            post_title: r.post.title
           }
         end
-        r.attributes.merge(user: r.user)
+        r.attributes.merge(user: r.user, post_title: r.post.title)
       end
     end
     render json: shortlisted_requests, status: :ok
