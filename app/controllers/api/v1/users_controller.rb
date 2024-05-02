@@ -126,11 +126,21 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def view_requests
-    all_requests = User.where(approval_status: [:approved, :rejected], role: :agency).order(created_at: :desc)
+    all_requests = User.where(role: :agency).order(created_at: :desc)
     if all_requests
-     render json: all_requests, status: :ok
+      requests_data = all_requests.map do |agency|
+        package_name = agency.package.name if agency.package.present?
+        {
+          id: agency.id,
+          username: agency.username,
+          email: agency.email,
+          package_name: package_name,
+          mobile_no: agency.mobile_no
+        }
+      end
+      render json: requests_data, status: :ok
     else
-      render json: {error: "No pending request present"}, status: :not_found
+      render json: { error: "No request present" }, status: :not_found
     end
   end
 

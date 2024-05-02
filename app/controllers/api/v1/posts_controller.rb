@@ -87,13 +87,15 @@ class Api::V1::PostsController < ApplicationController
   def create
     user = current_user
     package = user.package
-    if user.posts_count >= package.posts_limit
+    user.posts_count ||= 0
+    if user.posts_count > package.posts_limit
       render json: { error: "You need to upgrade your package to create more posts" }, status: :unprocessable_entity
       return
     end
     post = Post.new(post_params)
     post.agency = user
     if post.save
+      user.posts_count += 1
       render json: { id: post.id, message: "Post added successfully", script: post.script.attached? ? url_for(post.script) : '' }, status: :created
     else
       render json: { error: post.errors.full_messages }, status: :unprocessable_entity

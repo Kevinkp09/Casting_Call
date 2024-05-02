@@ -35,24 +35,12 @@ RSpec.describe User, type: :model do
     end
   end
   describe "associations" do
-    it "should have one attached profile photo" do
-      expect(User.new).to respond_to(:profile_photo)
-    end
-
-    it "should belong to a package" do
-      expect(User.reflect_on_association(:package).macro).to eq(:belongs_to)
-    end
-
-    it "should have many works" do
-      expect(User.reflect_on_association(:works).macro).to eq(:has_many)
-    end
-
-    it "should have many payments" do
-      expect(User.reflect_on_association(:payments).macro).to eq(:has_many)
-    end
-
-    it "should have many requests" do
-      expect(User.reflect_on_association(:requests).macro).to eq(:has_many)
-    end
+    it { should belong_to(:package).class_name('Package').with_foreign_key(:package_id).optional }
+    it { should have_many(:works) }
+    it { should have_many(:requests) }
+    it { should have_many(:posts).with_foreign_key(:agency_id) }
+    it { should have_one_attached(:profile_photo) }
+    it {should define_enum_for(:role).with_values(artist: 0, agency: 1, admin: 2) }
+    it {should define_enum_for(:skin_color).with_values(fair: 0, light: 1, dark: 2) }
   end
 end
