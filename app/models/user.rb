@@ -14,7 +14,7 @@ class User < ApplicationRecord
   has_many :payments
   has_many :requests
   has_many :posts, through: :requests
-  has_many :posts, foreign_key: 'agency_id'
+  has_many :posts, class_name: 'Post', foreign_key: 'agency_id'
   validates :email, format: URI::MailTo::EMAIL_REGEXP
   validates :mobile_no, presence: true, format: { with: VALID_MOBILE_REGEX, message: "Invalid" }
   validates :username, presence: true
