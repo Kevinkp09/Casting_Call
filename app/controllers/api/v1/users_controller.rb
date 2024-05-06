@@ -95,6 +95,7 @@ class Api::V1::UsersController < ApplicationController
     render json: {
     user: {
       id: user.id,
+      username: user.username,
       gender: user.gender,
       category: user.category,
       birth_date: user.birth_date,
@@ -236,7 +237,6 @@ class Api::V1::UsersController < ApplicationController
     user = User.find_by(email: params[:email])
     if user
       otp = generate_otp
-      user.update(otp: otp)
       UserMailer.forgot_password_email(user, otp).deliver_now
       render json: { message: "OTP has been sent to your email" }, status: :ok
     else
