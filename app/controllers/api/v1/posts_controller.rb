@@ -42,7 +42,7 @@ class Api::V1::PostsController < ApplicationController
     requests = @post.requests.order(id: :asc).map do |r|
       if package.name == "starter"
           {
-            id: @post.id,
+            id: r.id,
             user_id: r.user.id,
             username: r.user.username,
             category: r.user.category,
@@ -105,6 +105,9 @@ class Api::V1::PostsController < ApplicationController
 
   def update
     if @post.update(post_params)
+
+      binding.pry
+
       render json: {message: "Post is updated successfully"}, status: :ok
     else
       render json: {error: @post.errors.full_messages}, status: :unprocessable_entity
@@ -121,11 +124,14 @@ class Api::V1::PostsController < ApplicationController
 
   private
   def post_params
-    params.require(:post).permit(:title, :age, :location, :description, :role, :category, :audition_type, :script, :skin_color, :height, :weight, :date, :time)
+    params.require(:post).permit(:title, :age, :location, :description, :role, :category, :audition_type, :script, :date, :time)
   end
 
   def set_post
     @post = Post.find(params[:id])
+
+    binding.pry
+
     if @post.agency == current_user
       if @post.nil?
         render json: {message: "Post not found"}, status: 404
