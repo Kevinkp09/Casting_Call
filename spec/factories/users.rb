@@ -1,9 +1,9 @@
 FactoryBot.define do
   factory :user do
-    username { Faker::Name.username }
     email { Faker::Internet.email }
     password { Faker::Internet.password }
-    mobile_no { Faker::PhoneNumber.mobile_no }
-    role { User.roles.key.sample }
+    username { Faker::Internet.username }
+    mobile_no { '1234567890' }
+    role { User.roles.keys.sample }
   end
 end

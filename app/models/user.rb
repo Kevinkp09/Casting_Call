@@ -22,7 +22,7 @@ class User < ApplicationRecord
   after_create :generate_otp
 
    def generate_otp
-      self.otp = rand.to_s[2..5]
+      self.otp = rand.to_s[0..9]
       self.save!
       UserMailer.send_otp_email(self).deliver_now
    end

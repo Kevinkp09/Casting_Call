@@ -1,5 +1,5 @@
 class Api::V1::UsersController < ApplicationController
-    skip_before_action :doorkeeper_authorize!, only: %i[create login verify_otp credential]
+    skip_before_action :doorkeeper_authorize!, only: %i[create login verify_otp credential reset_password reset_password_code verify_otp]
     before_action :check_admin, only: [:view_requests, :reject_request ,:show_approved_agencies, :show_registered_artist]
 
   def create
@@ -83,7 +83,8 @@ class Api::V1::UsersController < ApplicationController
   def verify_otp
     user = User.find_by(email: params[:user][:email])
     otp = params[:user][:otp]
-    if user && user.otp == otp
+    if user && user.otp == otp && user.otp_generated_time >= 2.minutes.ago
+      user.update(otp: nil, otp_generated_time: nil)
       render json: {message: "OTP verified successfully"}, status: :ok
     else
       render json: {message: "Invalid OTP"}, status: :unprocessable_entity
@@ -92,9 +93,9 @@ class Api::V1::UsersController < ApplicationController
 
   def show_details
     user = current_user
-    render json: {
-    user: {
+    user_data = {
       id: user.id,
+      email: user.email,
       username: user.username,
       gender: user.gender,
       category: user.category,
@@ -104,8 +105,12 @@ class Api::V1::UsersController < ApplicationController
       height: user.height,
       weight: user.weight,
       profile_photo: user.profile_photo.attached? ? url_for(user.profile_photo) : ''
-      }
-    }, status: :ok
+    }
+
+    if user.package.present?
+      user_data[:package_name] = user.package.name
+    end
+    render json: { user: user_data }, status: :ok
   end
 
   def find_user
@@ -197,17 +202,38 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def filter_starter
-    starter_users = User.includes(:package).where(packages: {name: "starter"})
+    starter_users = User.includes(:package).where(packages: {name: "starter"}).map do |user|
+      {
+        username: user.username,
+        package_name: user.package&.name,
+        email: user.email,
+        mobile_no: user.mobile_no
+      }
+    end
     render json: starter_users, status: :ok
   end
 
   def filter_basic
-    basic_users = User.includes(:package).where(packages: {name: "basic"})
+    basic_users = User.includes(:package).where(packages: {name: "basic"}).map do |user|
+       {
+        username: user.username,
+        package_name: user.package&.name,
+        email: user.email,
+        mobile_no: user.mobile_no
+      }
+    end
     render json: basic_users, status: :ok
   end
 
   def filter_advance
-    advance_users = User.includes(:package).where(packages: {name: "advance"})
+    advance_users = User.includes(:package).where(packages: {name: "advance"}).map do |user|
+      {
+        username: user.username,
+        package_name: user.package&.name,
+        email: user.email,
+        mobile_no: user.mobile_no
+      }
+    end
     render json: advance_users, status: :ok
   end
 
@@ -216,7 +242,6 @@ class Api::V1::UsersController < ApplicationController
     works = user.works
     render json:{
       user: {
-        id: user.id,
         username: user.username,
         email: user.email,
         role: user.role,
@@ -233,10 +258,11 @@ class Api::V1::UsersController < ApplicationController
 
   end
 
-  def forgot
-    user = User.find_by(email: params[:email])
+  def reset_password_code
+    user = User.find_by(email: params[:user][:email])
     if user
       otp = generate_otp
+      user.update(otp: otp, otp_generated_time: Time.now)
       UserMailer.forgot_password_email(user, otp).deliver_now
       render json: { message: "OTP has been sent to your email" }, status: :ok
     else
@@ -244,19 +270,20 @@ class Api::V1::UsersController < ApplicationController
     end
   end
 
-  def reset
-    user = User.find_by(email: params[:email])
-    if user && user.otp == params[:otp]
-      user.update(password: params[:password], otp: nil)
+  def reset_password
+    user = User.find_by(email: params[:user][:email])
+    if user
+      new_password = params[:password]
+      user.update(password: new_password, otp: nil)
       render json: { message: "Password reset successfully" }, status: :ok
     else
-      render json: { error: "Invalid OTP" }, status: :unprocessable_entity
+      render json: {error: "User not found"}, status: :not_found
     end
   end
   private
 
   def user_params
-    params.require(:user).permit(:email, :password, :username, :mobile_no, :role, :otp, :posts_count)
+    params.require(:user).permit(:email, :password, :username, :mobile_no, :role, :otp, :posts_count, :otp_generated_time)
   end
 
   def personal_params
