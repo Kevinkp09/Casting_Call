@@ -6,9 +6,6 @@ RSpec.describe "Users", type: :request do
     context "with valid parameters" do
       it "creates a new user" do
          post "/api/v1/users", params: { user: FactoryBot.attributes_for(:user), client_id: application.uid}
-
-         binding.pry
-
         expect(response).to have_http_status(200)
       end
     end
