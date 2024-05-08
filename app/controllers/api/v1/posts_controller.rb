@@ -43,6 +43,7 @@ class Api::V1::PostsController < ApplicationController
       if package.name == "starter"
           {
             id: @post.id,
+            user_id: r.user.id,
             username: r.user.username,
             category: r.user.category,
             location: r.user.current_location,
@@ -103,7 +104,7 @@ class Api::V1::PostsController < ApplicationController
   end
 
   def update
-    if @post.agency == current_user && @post.update(post_params)
+    if @post.update(post_params)
       render json: {message: "Post is updated successfully"}, status: :ok
     else
       render json: {error: @post.errors.full_messages}, status: :unprocessable_entity
@@ -111,14 +112,10 @@ class Api::V1::PostsController < ApplicationController
   end
 
   def destroy
-    if @post.agency == current_user
-      if @post.requests.destroy_all && @post.destroy
-        render json: {message: "Post deleted successfully"}, status: :ok
-      else
-        render json: {error: @post.errors.full_messages}, status: :unprocessable_entity
-      end
+    if @post.requests.destroy_all && @post.destroy
+      render json: {message: "Post deleted successfully"}, status: :ok
     else
-      render json: {message: "You are not the owner of this post"}, status: :unauthorized
+      render json: {error: @post.errors.full_messages}, status: :unprocessable_entity
     end
   end
 
@@ -129,9 +126,13 @@ class Api::V1::PostsController < ApplicationController
 
   def set_post
     @post = Post.find(params[:id])
-    if @post.nil?
-      render json: {message: "Post not found"}, status: 404
-      return
+    if @post.agency == current_user
+      if @post.nil?
+        render json: {message: "Post not found"}, status: 404
+        return
+      end
+    else
+      render json: {error: "You are unauthorized for this action"}, status: :unauthorized
     end
   end
 

@@ -33,8 +33,8 @@ Rails.application.routes.draw do
         get :filter_advance, on: :collection
         get :credential, on: :collection
         get :view_profile
-        post :forgot, on: :collection
-        post :reset, on: :collection
+        post :reset_password_code, on: :collection
+        put :reset_password, on: :collection
       end
         resources :works, only: [:index, :update, :create, :destroy]
         resources :posts, only: [:create, :index, :update, :destroy, :show] do

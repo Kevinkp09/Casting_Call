@@ -48,7 +48,7 @@ group :development, :test do
   gem 'rspec-rails'
   gem 'shoulda-matchers'
   gem 'factory_bot_rails'
-  gem 'faker'
+  gem 'faker', require: false
 end
 
 group :development do
