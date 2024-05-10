@@ -19,10 +19,13 @@ class User < ApplicationRecord
   validates :mobile_no, presence: true, format: { with: VALID_MOBILE_REGEX, message: "Invalid" }
   validates :username, presence: true
   validates :role, presence: true
+  validates :birth_date, presence: true
+  validates :gender, presence: true
   after_create :generate_otp
 
    def generate_otp
-      self.otp = rand.to_s[0..9]
+      self.otp = rand.to_s[2..5]
+      self.otp_generated_time = Time.now
       self.save!
       UserMailer.send_otp_email(self).deliver_now
    end

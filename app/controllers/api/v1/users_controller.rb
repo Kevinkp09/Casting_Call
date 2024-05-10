@@ -262,7 +262,7 @@ class Api::V1::UsersController < ApplicationController
     user = User.find_by(email: params[:user][:email])
     if user
       otp = generate_otp
-      user.update(otp: otp, otp_generated_time: Time.now)
+      user.update(otp: otp)
       UserMailer.forgot_password_email(user, otp).deliver_now
       render json: { message: "OTP has been sent to your email" }, status: :ok
     else
@@ -283,11 +283,11 @@ class Api::V1::UsersController < ApplicationController
   private
 
   def user_params
-    params.require(:user).permit(:email, :password, :username, :mobile_no, :role, :otp, :posts_count, :otp_generated_time)
+    params.require(:user).permit(:email, :password, :username, :mobile_no, :role, :otp, :posts_count, :otp_generated_time, :gender, :birth_date)
   end
 
   def personal_params
-    params.require(:user).permit(:gender, :category, :birth_date, :current_location, :profile_photo, :skin_color, :height, :weight)
+    params.require(:user).permit(:category, :current_location, :profile_photo, :skin_color, :height, :weight)
   end
 
   def generate_refresh_token
