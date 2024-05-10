@@ -2,7 +2,17 @@ class Api::V1::WorksController < ApplicationController
   def index
     user = current_user
     works = user.works.order(created_at: :desc)
-    render json: works, status: :ok
+    response = works.map do |work|
+      {
+        id: work.id,
+        project_name: work.project_name,
+        artist_role: work.artist_role,
+        year: work.year,
+        youtube_link: work.youtube_link,
+        images: work.images.map { |image| url_for(image) }
+      }
+    end
+    render json: response, status: :ok
   end
 
   def create
@@ -44,6 +54,6 @@ class Api::V1::WorksController < ApplicationController
   private
 
   def work_params
-    params.require(:work).permit(:project_name, :year, :youtube_link, :artist_role)
+    params.require(:work).permit(:project_name, :year, :youtube_link, :artist_role, :images)
   end
 end
