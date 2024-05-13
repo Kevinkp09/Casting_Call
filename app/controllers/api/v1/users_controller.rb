@@ -106,9 +106,8 @@ class Api::V1::UsersController < ApplicationController
       skin_color: user.skin_color,
       height: user.height,
       weight: user.weight,
-      profile_photo: user.profile_photo.attached? ? url_for(user.profile_photo) : ''
+      profile_photo: user.profile_photo.attached? ? url_for(user.profile_photo) : '',
     }
-
     if user.package.present?
       user_data[:package_name] = user.package.name
     end
@@ -138,12 +137,14 @@ class Api::V1::UsersController < ApplicationController
     if all_requests
       requests_data = all_requests.map do |agency|
         package_name = agency.package.name if agency.package.present?
+        payment_id = agency.payment&.razorpay_payment_id
         {
           id: agency.id,
           username: agency.username,
           email: agency.email,
           package_name: package_name,
-          mobile_no: agency.mobile_no
+          mobile_no: agency.mobile_no,
+          payment_id: payment_id
         }
       end
       render json: requests_data, status: :ok
@@ -190,9 +191,9 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def upgrade_advance
+    user = current_user
+    package = user.package
     if user.role == "agency"
-      user = current_user
-      package = user.package
       if (package.name == "starter" || package.name == "basic") && package.update(name: "advance", posts_limit: nil, requests_limit: nil)
         render json: {message: "Your package has been updated to advance successfully"}, status: :ok
       else
@@ -285,7 +286,7 @@ class Api::V1::UsersController < ApplicationController
   private
 
   def user_params
-    params.require(:user).permit(:email, :password, :username, :mobile_no, :role, :otp, :posts_count, :otp_generated_time, :gender, :birth_date)
+    params.require(:user).permit(:email, :password, :username, :mobile_no, :role, :otp, :posts_count, :otp_generated_time, :gender, :birth_date, :is_agency, :agency_name)
   end
 
   def personal_params
