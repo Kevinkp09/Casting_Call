@@ -54,6 +54,6 @@ class Api::V1::WorksController < ApplicationController
   private
 
   def work_params
-    params.require(:work).permit(:project_name, :year, :youtube_link, :artist_role, :images)
+    params.require(:work).permit(:project_name, :year, :youtube_link, :artist_role, images: [])
   end
 end

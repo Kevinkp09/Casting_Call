@@ -7,6 +7,7 @@ class User < ApplicationRecord
   enum role: {artist: 0, agency: 1, admin: 2}
   enum approval_status: {approved: 0, rejected: 1}
   enum skin_color: {fair: 0, light: 1, dark: 2}
+  enum is_agency: {No: 0, Yes: 1}
          VALID_MOBILE_REGEX = /\A\d{10}\z/
   has_one_attached :profile_photo
   belongs_to :package, class_name: "Package", foreign_key: "package_id", optional: true
@@ -19,8 +20,8 @@ class User < ApplicationRecord
   validates :mobile_no, presence: true, format: { with: VALID_MOBILE_REGEX, message: "Invalid" }
   validates :username, presence: true
   validates :role, presence: true
-  validates :birth_date, presence: true
-  validates :gender, presence: true
+#   validates :birth_date, presence: true
+#   validates :gender, presence: true
   after_create :generate_otp
 
    def generate_otp
