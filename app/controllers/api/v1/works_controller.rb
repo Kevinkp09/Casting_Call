@@ -18,6 +18,9 @@ class Api::V1::WorksController < ApplicationController
   def create
     user = current_user
     work = user.works.new(work_params)
+
+    binding.pry
+    
     if work.save
       render json: {message: "Work details added successfully"}, status: :ok
     else

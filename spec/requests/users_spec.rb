@@ -70,9 +70,10 @@ RSpec.describe "Users", type: :request do
       before do
         sign_in user
         @access_token = Doorkeeper::AccessToken.create!(resource_owner_id: user.id, application_id: application.id, token: '1234567890')
+        allow_any_instance_of(User).to receive(:save).and_return(false)
       end
       it 'returns an unprocessable entity status' do
-        put "/api/v1/users/add_details",  params: { user: { height: 123456 } }, headers: { Authorization: "Bearer #{@access_token.token}" }
+        put "/api/v1/users/add_details",  params: { user: { height: 'Invalid'} }, headers: { Authorization: "Bearer #{@access_token.token}" }
         expect(response).to have_http_status(422)
       end
     end
@@ -80,6 +81,17 @@ RSpec.describe "Users", type: :request do
       it 'returns an unauthorized status' do
         put "/api/v1/users/add_details", params: { user: personal_params }
         expect(response).to have_http_status(:unauthorized)
+      end
+    end
+  end
+  describe "GET /api/v1/users/show_details " do
+    context "with valid params" do
+      before do
+        sign_in user
+        @access_token = Doorkeeper::AccessToken.create!(resource_owner_id: user.id, application_id: application.id, token: "1234567890")
+      end
+      it "shows users personal details" do
+        get "/api/v1/users/show_details", params: {user: personal_params},  headers: {Authorization: "Bearer #{@access_token.token}"}
       end
     end
   end
