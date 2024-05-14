@@ -137,14 +137,12 @@ class Api::V1::UsersController < ApplicationController
     if all_requests
       requests_data = all_requests.map do |agency|
         package_name = agency.package.name if agency.package.present?
-        payment_id = agency.payment&.razorpay_payment_id
         {
           id: agency.id,
           username: agency.username,
           email: agency.email,
           package_name: package_name,
-          mobile_no: agency.mobile_no,
-          payment_id: payment_id
+          mobile_no: agency.mobile_no
         }
       end
       render json: requests_data, status: :ok

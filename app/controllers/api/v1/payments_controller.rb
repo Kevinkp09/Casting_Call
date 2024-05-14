@@ -47,9 +47,6 @@ class Api::V1::PaymentsController < ApplicationController
         @payment.update(status_type: 'paid', razorpay_payment_id: payment_id)
         @user = @payment.agency
         if @user.present?
-
-          binding.pry
-          
           @user.update(package: @payment.package)
         else
           render json: {message: "User not found"}, status: :not_found
