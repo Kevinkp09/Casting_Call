@@ -124,19 +124,10 @@ RSpec.describe "Users", type: :request do
       let(:agency_user) { create(:user, role: :agency) }
       before do
         sign_in user
-
-        binding.pry
-
         @access_token = Doorkeeper::AccessToken.create!(resource_owner_id: user.id, application_id: application.id, token: "1234567890")
       end
       it 'rejects and removes the agency successfully' do
-
-        binding.pry
-
         put "/api/v1/users/#{agency_user.id}reject_request", params: { user_id: agency_user.id }, headers: {Authorization: "Bearer #{@access_token.token}"}
-
-       binding.pry
-
         expect(response).to have_http_status(:ok)
       end
     end
