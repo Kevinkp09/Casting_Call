@@ -133,16 +133,18 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def view_requests
-    all_requests = User.where(role: :agency).order(created_at: :desc)
+    all_requests = User.left_joins(:payments).where(role: :agency).order(created_at: :desc)
     if all_requests
       requests_data = all_requests.map do |agency|
-        package_name = agency.package.name if agency.package.present?
+        package = agency.package.presence
+        agency_payment = agency.payments.find_by(package: package, status_type: 'paid') if package
         {
           id: agency.id,
           username: agency.username,
           email: agency.email,
-          package_name: package_name,
-          mobile_no: agency.mobile_no
+          package_name: package&.name || 'No package',
+          mobile_no: agency.mobile_no,
+          payment_id: agency_payment&.razorpay_payment_id || 'N/A'
         }
       end
       render json: requests_data, status: :ok
@@ -241,6 +243,16 @@ class Api::V1::UsersController < ApplicationController
   def view_profile
     user = User.find(params[:user_id])
     works = user.works
+    works_data = works.map do |work|
+      {
+         id: work.id,
+         project_name: work.project_name,
+         year: work.year,
+         youtube_link: work.youtube_link,
+         artist_role: work.artist_role,
+         images: work.images.map { |image| url_for(image) }
+      }
+    end
     render json:{
       user: {
         username: user.username,
@@ -254,9 +266,8 @@ class Api::V1::UsersController < ApplicationController
         birth_date: user.birth_date,
         current_location: user.current_location,
         profile_photo: user.profile_photo.attached? ? url_for(user.profile_photo) : ''
-      }, works: works.map{|work| work.attributes}
+      }, works: works_data
     }, status: :ok
-
   end
 
   def reset_password_code

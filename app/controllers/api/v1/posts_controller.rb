@@ -51,7 +51,16 @@ class Api::V1::PostsController < ApplicationController
             status: r.status
           }
       else
-        r.attributes.merge({ user: r.user })
+        {
+          id: r.id,
+          user_id: r.user.id,
+          username: r.user.username,
+          category: r.user.category,
+          location: r.user.current_location,
+          gender: r.user.gender,
+          status: r.status,
+          email: r.user.email,
+        }
       end
     end
     requests = requests.take(package.requests_limit) unless package.requests_limit.nil?
