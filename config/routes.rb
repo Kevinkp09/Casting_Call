@@ -37,6 +37,7 @@ Rails.application.routes.draw do
         put :reset_password, on: :collection
         post :add_images, on: :collection
         get :show_images, on: :collection
+        delete :delete_image, on: :member
       end
         resources :works, only: [:index, :update, :create, :destroy]
         resources :posts, only: [:create, :index, :update, :destroy, :show] do
