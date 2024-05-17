@@ -85,7 +85,7 @@ class Api::V1::UsersController < ApplicationController
   def verify_otp
     user = User.find_by(email: params[:user][:email])
     otp = params[:user][:otp]
-    if user && user.otp == otp && user.otp_generated_time >= 2.minutes.ago
+    if user.otp == otp && user.otp_generated_time >= 2.minutes.ago
       user.update(otp: nil, otp_generated_time: nil)
       render json: {message: "OTP verified successfully"}, status: :ok
     else
@@ -274,7 +274,7 @@ class Api::V1::UsersController < ApplicationController
     user = User.find_by(email: params[:user][:email])
     if user
       otp = generate_otp
-      user.update(otp: otp)
+      user.update(otp: otp, otp_generated_time: Time.now)
       UserMailer.forgot_password_email(user, otp).deliver_now
       render json: { message: "OTP has been sent to your email" }, status: :ok
     else
@@ -292,10 +292,31 @@ class Api::V1::UsersController < ApplicationController
       render json: {error: "User not found"}, status: :not_found
     end
   end
+
+  def add_images
+    user = current_user
+    if params[:user][:images].present?
+      user.images.attach(params[:user][:images])
+      render json: { message: 'Images added successfully' } , status: :ok
+    else
+      render json: { error: 'No images provided' }, status: :unprocessable_entity
+    end
+  end
+
+  def show_images
+    user = current_user
+    if user.images.attached?
+      images = user.images.map { |img| url_for(img) }
+      render json: images, status: :ok
+    else
+      render json: { message: "No images found" }, status: :not_found
+    end
+  end
+
   private
 
   def user_params
-    params.require(:user).permit(:email, :password, :username, :mobile_no, :role, :otp, :posts_count, :otp_generated_time, :gender, :birth_date, :is_agency, :agency_name)
+    params.require(:user).permit(:email, :password, :username, :mobile_no, :role, :otp, :posts_count, :otp_generated_time, :gender, :birth_date, :is_agency, :agency_name, images: [])
   end
 
   def personal_params
