@@ -10,6 +10,7 @@ class User < ApplicationRecord
   enum is_agency: {No: 0, Yes: 1}
          VALID_MOBILE_REGEX = /\A\d{10}\z/
   has_one_attached :profile_photo
+  has_many_attached :images
   belongs_to :package, class_name: "Package", foreign_key: "package_id", optional: true
   has_many :works
   has_many :payments, foreign_key: 'agency_id'
@@ -26,7 +27,6 @@ class User < ApplicationRecord
 
    def generate_otp
       self.otp = rand.to_s[2..5]
-      self.otp_generated_time = Time.now
       self.save!
       UserMailer.send_otp_email(self).deliver_now
    end

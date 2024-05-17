@@ -9,7 +9,6 @@ class Api::V1::WorksController < ApplicationController
         artist_role: work.artist_role,
         year: work.year,
         youtube_link: work.youtube_link,
-        images: work.images.map { |image| url_for(image) }
       }
     end
     render json: response, status: :ok
@@ -54,6 +53,6 @@ class Api::V1::WorksController < ApplicationController
   private
 
   def work_params
-    params.require(:work).permit(:project_name, :year, :youtube_link, :artist_role, images: [])
+    params.require(:work).permit(:project_name, :year, :youtube_link, :artist_role)
   end
 end
