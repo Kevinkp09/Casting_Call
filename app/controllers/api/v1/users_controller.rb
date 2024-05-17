@@ -10,6 +10,7 @@ class Api::V1::UsersController < ApplicationController
     client_app = Doorkeeper::Application.find_by(uid: params[:client_id])
     return render(json: { error: 'Invalid client ID'}, status: 403) unless client_app
     if user.save
+      user.update(otp_generated_time: Time.now)
       # create access token for the user, so the user won't need to login again after registration
       access_token = Doorkeeper::AccessToken.create(
         resource_owner_id: user.id,
@@ -31,6 +32,7 @@ class Api::V1::UsersController < ApplicationController
           token_type: 'bearer',
           gender: user.gender,
           birth_date: user.birth_date,
+          otp_generated_time: user.otp_generated_time,
           expires_in: access_token.expires_in,
           refresh_token: access_token.refresh_token,
           created_at: access_token.created_at.to_time.to_i
@@ -82,10 +84,19 @@ class Api::V1::UsersController < ApplicationController
     end
   end
 
+  def delete_image
+    @image = ActiveStorage::Attachment.find(params[:id])
+    if @image.purge
+      render json: {message: "Image deleted successfully"}, status: :ok
+    else
+      render json: {error: @image.errors.full_messages}, status: :unprocessable_entity
+    end
+  end
+
   def verify_otp
     user = User.find_by(email: params[:user][:email])
     otp = params[:user][:otp]
-    if user.otp == otp && user.otp_generated_time >= 2.minutes.ago
+    if user && user.otp == otp && user.otp_generated_time >= 2.minutes.ago
       user.update(otp: nil, otp_generated_time: nil)
       render json: {message: "OTP verified successfully"}, status: :ok
     else
