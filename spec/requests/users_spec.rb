@@ -6,7 +6,7 @@ RSpec.describe "Users", type: :request do
   describe "POST /api/v1/users" do
     context "with valid parameters" do
       it "creates a new user" do
-         post "/api/v1/users", params: { user: FactoryBot.attributes_for(:user), client_id: application.uid}
+        post "/api/v1/users", params: { user: FactoryBot.attributes_for(:user), client_id: application.uid}
         expect(response).to have_http_status(200)
       end
     end
@@ -118,7 +118,7 @@ RSpec.describe "Users", type: :request do
       end
     end
   end
-  describe "PUT /api/v1/users/:user_idreject_request" do
+  describe "PUT /api/v1/users/:user_id/reject_request" do
     context "when user is an admin" do
       let(:user) { create(:user, role: :admin) }
       let(:agency_user) { create(:user, role: :agency) }
@@ -127,8 +127,45 @@ RSpec.describe "Users", type: :request do
         @access_token = Doorkeeper::AccessToken.create!(resource_owner_id: user.id, application_id: application.id, token: "1234567890")
       end
       it 'rejects and removes the agency successfully' do
-        put "/api/v1/users/#{agency_user.id}reject_request", params: { user_id: agency_user.id }, headers: {Authorization: "Bearer #{@access_token.token}"}
+        put "/api/v1/users/#{agency_user.id}/reject_request", params: { user_id: agency_user.id }, headers: {Authorization: "Bearer #{@access_token.token}"}
         expect(response).to have_http_status(:ok)
+      end
+    end
+  end
+  describe "PUT /api/v1/users/upgrade_basic" do
+    context "when user is an agency with starter package" do
+      let(:user) { create(:user, role: :agency) }
+      let(:starter_package) { create(:package, name: "starter") }
+
+      before do
+        user.package = starter_package
+        user.save
+        sign_in user
+        @access_token = Doorkeeper::AccessToken.create!(resource_owner_id: user.id, application_id: application.id, token: "1234567890")
+      end
+
+      it 'upgrades the package to basic successfully' do
+        put "/api/v1/users/upgrade_basic", headers: { Authorization: "Bearer #{@access_token.token}" }
+        expect(response).to have_http_status(:ok)
+      end
+
+      it 'returns an error if the package update fails' do
+        allow_any_instance_of(Package).to receive(:update).and_return(false)
+        put "/api/v1/users/upgrade_basic", headers: { Authorization: "Bearer #{@access_token.token}" }
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
+    end
+
+    context "when user is not an agency" do
+      let(:user) { create(:user, role: :artist) }
+      before do
+        sign_in user
+        @access_token = Doorkeeper::AccessToken.create!(resource_owner_id: user.id, application_id: application.id, token: "1234567890")
+      end
+
+      it 'returns an unauthorized error' do
+        put "/api/v1/users/upgrade_basic", headers: { Authorization: "Bearer #{@access_token.token}" }
+        expect(response).to have_http_status(:unauthorized)
       end
     end
   end
