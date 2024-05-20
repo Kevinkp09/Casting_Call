@@ -261,7 +261,6 @@ class Api::V1::UsersController < ApplicationController
          year: work.year,
          youtube_link: work.youtube_link,
          artist_role: work.artist_role,
-         images: work.images.map { |image| url_for(image) }
       }
     end
     render json:{
