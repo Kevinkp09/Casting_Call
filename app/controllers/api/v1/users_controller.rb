@@ -308,7 +308,13 @@ class Api::V1::UsersController < ApplicationController
     user = current_user
     if params[:user][:images].present?
       user.images.attach(params[:user][:images])
-      render json: { message: 'Images added successfully' } , status: :ok
+       images_details = user.images.map do |image|
+      {
+        id: image.id,
+        filename: image.filename.to_s,
+      }
+      end
+      render json: {message: "Image added successfully", images: images_details}
     else
       render json: { error: 'No images provided' }, status: :unprocessable_entity
     end
@@ -317,7 +323,11 @@ class Api::V1::UsersController < ApplicationController
   def show_images
     user = current_user
     if user.images.attached?
-      images = user.images.map { |img| url_for(img) }
+      images = user.images.map  |image|
+      {
+         url: url_for(image),
+         id: image.id
+      }
       render json: images, status: :ok
     else
       render json: { message: "No images found" }, status: :not_found

@@ -40,7 +40,6 @@ class Api::V1::PostsController < ApplicationController
     package = user.package
     @post = Post.find(params[:post_id])
     requests = @post.requests.order(id: :asc).map do |r|
-      if package.name == "starter"
           {
             id: r.id,
             user_id: r.user.id,
@@ -48,23 +47,12 @@ class Api::V1::PostsController < ApplicationController
             category: r.user.category,
             location: r.user.current_location,
             gender: r.user.gender,
-            status: r.status
+            status: r.status,
+            email: r.user.email,
           }
-      else
-        {
-          id: r.id,
-          user_id: r.user.id,
-          username: r.user.username,
-          category: r.user.category,
-          location: r.user.current_location,
-          gender: r.user.gender,
-          status: r.status,
-          email: r.user.email,
-        }
-      end
     end
     requests = requests.take(package.requests_limit) unless package.requests_limit.nil?
-    render json: {requests: requests, message: "This is the limit."}, status: :ok
+    render json: {requests: requests, package: package, message: "This is the limit."}, status: :ok
   end
 
   def show_posts
