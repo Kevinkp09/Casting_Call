@@ -323,11 +323,12 @@ class Api::V1::UsersController < ApplicationController
   def show_images
     user = current_user
     if user.images.attached?
-      images = user.images.map  |image|
+      images = user.images.map do |image|
       {
          url: url_for(image),
          id: image.id
       }
+    end
       render json: images, status: :ok
     else
       render json: { message: "No images found" }, status: :not_found
