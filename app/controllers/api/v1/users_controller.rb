@@ -254,6 +254,12 @@ class Api::V1::UsersController < ApplicationController
   def view_profile
     user = User.find(params[:user_id])
     works = user.works
+    images = user.images.map do |image|
+      {
+        url: url_for(image),
+        id: image.id
+      }
+    end
     works_data = works.map do |work|
       {
          id: work.id,
@@ -275,7 +281,9 @@ class Api::V1::UsersController < ApplicationController
         category: user.category,
         birth_date: user.birth_date,
         current_location: user.current_location,
-        profile_photo: user.profile_photo.attached? ? url_for(user.profile_photo) : ''
+        profile_photo: user.profile_photo.attached? ? url_for(user.profile_photo) : '',
+        images: images
+
       }, works: works_data
     }, status: :ok
   end
