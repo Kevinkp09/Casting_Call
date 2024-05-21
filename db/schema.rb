@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_05_13_094616) do
+ActiveRecord::Schema[7.1].define(version: 2024_05_21_091134) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -105,6 +105,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_13_094616) do
     t.decimal "weight", precision: 5, scale: 2
     t.date "date"
     t.time "time"
+    t.string "project_type"
   end
 
   create_table "requests", force: :cascade do |t|
@@ -143,6 +144,15 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_13_094616) do
     t.integer "posts_count", default: 0
     t.string "agency_name"
     t.integer "is_agency", default: 0
+    t.string "country"
+    t.string "state"
+    t.string "city"
+    t.string "language"
+    t.boolean "otp_verified", default: false
+    t.string "account_no"
+    t.string "branch_name"
+    t.string "pan_no"
+    t.string "gst_no"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
@@ -155,6 +165,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_13_094616) do
     t.integer "user_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "project_type"
     t.index ["user_id"], name: "index_works_on_user_id"
   end
 

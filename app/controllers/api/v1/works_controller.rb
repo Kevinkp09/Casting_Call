@@ -53,6 +53,6 @@ class Api::V1::WorksController < ApplicationController
   private
 
   def work_params
-    params.require(:work).permit(:project_name, :year, :youtube_link, :artist_role)
+    params.require(:work).permit(:project_name, :year, :youtube_link, :artist_role, :project_type)
   end
 end

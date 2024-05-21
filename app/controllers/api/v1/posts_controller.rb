@@ -22,12 +22,15 @@ class Api::V1::PostsController < ApplicationController
           height: post.height,
           date: post.date,
           time: post.time,
+          project_type: post.project_type,
           approval_status: approval_status,
           apply_status: request_status,
           script: post.script.attached? ? url_for(post.script) : ''
         }
       end
       render json: { posts: posts_data }, status: :ok
+    else
+      render json: {error: "You are unauthorized for this action."}, status: :unauthorized
     end
   end
 
@@ -40,16 +43,16 @@ class Api::V1::PostsController < ApplicationController
     package = user.package
     @post = Post.find(params[:post_id])
     requests = @post.requests.order(id: :asc).map do |r|
-          {
-            id: r.id,
-            user_id: r.user.id,
-            username: r.user.username,
-            category: r.user.category,
-            location: r.user.current_location,
-            gender: r.user.gender,
-            status: r.status,
-            email: r.user.email,
-          }
+        {
+          id: r.id,
+          user_id: r.user.id,
+          username: r.user.username,
+          category: r.user.category,
+          location: r.user.current_location,
+          gender: r.user.gender,
+          status: r.status,
+          email: r.user.email,
+        }
     end
     requests = requests.take(package.requests_limit) unless package.requests_limit.nil?
     render json: {requests: requests, package: package, message: "This is the limit."}, status: :ok
@@ -72,6 +75,7 @@ class Api::V1::PostsController < ApplicationController
           weight: post.weight,
           height: post.height,
           date: post.date,
+          project_type: post.project_type,
           time: post.time,
           script: post.script.attached? ? url_for(post.script) : ''
         }
@@ -119,7 +123,7 @@ class Api::V1::PostsController < ApplicationController
 
   private
   def post_params
-    params.require(:post).permit(:title, :age, :location, :description, :role, :category, :audition_type,:skin_color, :weight, :height, :script, :date, :time)
+    params.require(:post).permit(:title, :age, :location, :description, :role, :category, :audition_type,:skin_color, :weight, :height, :script, :date, :time, :project_type)
   end
 
   def set_post
