@@ -48,10 +48,16 @@ class Api::V1::PaymentsController < ApplicationController
         @user = @payment.agency
         if @user.present?
           @user.update(package: @payment.package)
+          bank_details = {
+            account_no: @user.account_no,
+            branch_name: @user.branch_name,
+            pan_no: @user.pan_no,
+            gst_no: @user.gst_no
+          }
         else
           render json: {message: "User not found"}, status: :not_found
         end
-        render json: {message: "Payment is done successfully", data: {payment: @payment} }, status: :ok
+        render json: {message: "Payment is done successfully", bank_details: bank_details, data: {payment: @payment} }, status: :ok
       else
         render json: {message: "Payment not found"}, status: :not_found
       end

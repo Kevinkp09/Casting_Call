@@ -55,30 +55,33 @@ class Api::V1::UsersController < ApplicationController
       return
     end
     if user&.valid_password?(params[:user][:password])
+      if user.otp_verified
+        client_app = Doorkeeper::Application.find_by(uid: params[:client_id])
+        access_token = Doorkeeper::AccessToken.create(
+          resource_owner_id: user.id,
+          application_id: client_app.id,
+          refresh_token: generate_refresh_token,
+          expires_in: Doorkeeper.configuration.access_token_expires_in.to_i,
+          scopes: ''
+        )
 
-      client_app = Doorkeeper::Application.find_by(uid: params[:client_id])
-      access_token = Doorkeeper::AccessToken.create(
-        resource_owner_id: user.id,
-        application_id: client_app.id,
-        refresh_token: generate_refresh_token,
-        expires_in: Doorkeeper.configuration.access_token_expires_in.to_i,
-        scopes: ''
-      )
-
-      render(json: {
-        message: 'User login successfully',
-        user: {
-          id: user.id,
-          role: user.role,
-          email: user.email,
-          access_token: access_token.token,
-          username: user.username,
-          token_type: 'bearer',
-          expires_in: access_token.expires_in,
-          refresh_token: access_token.refresh_token,
-          created_at: access_token.created_at.to_time.to_i,
-        }
-      })
+        render(json: {
+          message: 'User login successfully',
+          user: {
+            id: user.id,
+            role: user.role,
+            email: user.email,
+            access_token: access_token.token,
+            username: user.username,
+            token_type: 'bearer',
+            expires_in: access_token.expires_in,
+            refresh_token: access_token.refresh_token,
+            created_at: access_token.created_at.to_time.to_i,
+          }
+        })
+      else
+        render json: {error: user.errros.full_messages}, status: :unprocessable_entity
+      end
     else
       render json: {error: "Invalid email or password" }, status: :unprocessable_entity
     end
@@ -97,7 +100,7 @@ class Api::V1::UsersController < ApplicationController
     user = User.find_by(email: params[:user][:email])
     otp = params[:user][:otp]
     if user && user.otp == otp && user.otp_generated_time >= 2.minutes.ago
-      user.update(otp: nil, otp_generated_time: nil)
+      user.update(otp: nil, otp_generated_time: nil, otp_verified: true)
       render json: {message: "OTP verified successfully"}, status: :ok
     else
       render json: {message: "Invalid OTP"}, status: :unprocessable_entity
@@ -192,7 +195,13 @@ class Api::V1::UsersController < ApplicationController
     package = user.package
     if user.role == "agency"
       if package && package.name == "starter" && package.update(name: "basic", posts_limit: 5, requests_limit: nil)
-        render json: { message: "Your package has been updated to basic successfully" }, status: :ok
+        bank_details = {
+          account_no: user.account_no,
+          branch_name: user.branch_name,
+          pan_no: user.pan_no,
+          gst_no: user.gst_no
+        }
+        render json: { message: "Your package has been updated to basic successfully", bank_details: bank_details }, status: :ok
       else
         render json: { error: package.errors.full_messages }, status: :unprocessable_entity
       end
@@ -206,7 +215,13 @@ class Api::V1::UsersController < ApplicationController
     package = user.package
     if user.role == "agency"
       if (package.name == "starter" || package.name == "basic") && package.update(name: "advance", posts_limit: nil, requests_limit: nil)
-        render json: {message: "Your package has been updated to advance successfully"}, status: :ok
+        bank_details = {
+          account_no: user.account_no,
+          branch_name: user.branch_name,
+          pan_no: user.pan_no,
+          gst_no: user.gst_no
+        }
+        render json: {message: "Your package has been updated to advance successfully", bank_details: bank_details}, status: :ok
       else
         render json: {error: package.errors.full_messages}, status: unprocessable_entity
       end
@@ -345,7 +360,7 @@ class Api::V1::UsersController < ApplicationController
   private
 
   def user_params
-    params.require(:user).permit(:email, :password, :username, :mobile_no, :role, :otp, :posts_count, :otp_generated_time, :gender, :birth_date, :is_agency, :agency_name, images: [])
+    params.require(:user).permit(:email, :password, :username, :mobile_no, :role, :otp, :posts_count, :otp_generated_time, :gender, :birth_date, :is_agency, :country, :city, :state, :language, :agency_name,:otp_verified, :account_no, :branch_name, :pan_no, :gst_no, images: [], )
   end
 
   def personal_params
