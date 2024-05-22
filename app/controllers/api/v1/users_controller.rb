@@ -357,7 +357,7 @@ class Api::V1::UsersController < ApplicationController
     end
   end
 
-  def add_video
+  def add_videos
     user = current_user
     if params[:user][:videos].present?
       user.videos.attach(params[:user][:videos])
@@ -385,6 +385,15 @@ class Api::V1::UsersController < ApplicationController
       render json: videos, status: :ok
     else
       render json: { message: "No videos found" }, status: :not_found
+    end
+  end
+
+  def delete_video
+    @video = ActiveStorage::Attachment.find(params[:id])
+    if @video.purge
+      render json: {message: "Image deleted successfully"}, status: :ok
+    else
+      render json: {error: @video.errors.full_messages}, status: :unprocessable_entity
     end
   end
 
