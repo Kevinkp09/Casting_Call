@@ -80,7 +80,7 @@ class Api::V1::UsersController < ApplicationController
           }
         })
       else
-        render json: {error: user.errros.full_messages}, status: :unprocessable_entity
+        render json: {error: "You haven't verified the otp."}, status: :unprocessable_entity
       end
     else
       render json: {error: "Invalid email or password" }, status: :unprocessable_entity
@@ -357,10 +357,41 @@ class Api::V1::UsersController < ApplicationController
     end
   end
 
+  def add_video
+    user = current_user
+    if params[:user][:videos].present?
+      user.videos.attach(params[:user][:videos])
+      videos_details = user.videos.map do |video|
+        {
+          id: video.id,
+          filename: video.filename.to_s,
+        }
+      end
+      render json: {message: "Video added successfully", videos: videos_details}
+    else
+      render json: {error: "No videos provided"}, status: :not_found
+    end
+  end
+
+  def show_videos
+    user = current_user
+    if user.videos.attached?
+      videos = user.videos.map do |video|
+      {
+        url: url_for(video),
+        id: video.id
+      }
+    end
+      render json: videos, status: :ok
+    else
+      render json: { message: "No videos found" }, status: :not_found
+    end
+  end
+
   private
 
   def user_params
-    params.require(:user).permit(:email, :password, :username, :mobile_no, :role, :otp, :posts_count, :otp_generated_time, :gender, :birth_date, :is_agency, :country, :city, :state, :language, :agency_name,:otp_verified, :account_no, :branch_name, :pan_no, :gst_no, images: [], )
+    params.require(:user).permit(:email, :password, :username, :mobile_no, :role, :otp, :posts_count, :otp_generated_time, :gender, :birth_date, :is_agency, :country, :city, :state, :language, :agency_name,:otp_verified, :account_no, :branch_name, :pan_no, :gst_no, images: [], videos: [] )
   end
 
   def personal_params
