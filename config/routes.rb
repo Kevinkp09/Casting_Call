@@ -38,6 +38,9 @@ Rails.application.routes.draw do
         post :add_images, on: :collection
         get :show_images, on: :collection
         delete :delete_image, on: :member
+        post :add_videos, on: :collection
+        get :show_videos, on: :collection
+        delete :delete_video, on: :member
       end
         resources :works, only: [:index, :update, :create, :destroy]
         resources :posts, only: [:create, :index, :update, :destroy, :show] do
