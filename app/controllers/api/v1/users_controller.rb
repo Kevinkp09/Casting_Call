@@ -377,11 +377,11 @@ class Api::V1::UsersController < ApplicationController
     user = current_user
     if user.videos.attached?
       videos = user.videos.map do |video|
-      {
-        url: url_for(video),
-        id: video.id
-      }
-    end
+        {
+          url: url_for(video),
+          id: video.id
+        }
+      end
       render json: videos, status: :ok
     else
       render json: { message: "No videos found" }, status: :not_found
