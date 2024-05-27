@@ -78,7 +78,7 @@ class Api::V1::RequestsController < ApplicationController
 
   private
   def request_params
-    params.require(:request).permit(:status, :apply_status)
+    params.require(:request).permit(:status, :apply_status, :link)
   end
 
   def set_post
