@@ -23,7 +23,7 @@ class Api::V1::PostsController < ApplicationController
           date: post.date,
           time: post.time,
           project_type: post.project_type,
-          google_link: post.google_link,
+          google_link: post.google_link.present? ?  post.google_link : "N/A",
           approval_status: approval_status,
           apply_status: request_status,
           script: post.script.attached? ? url_for(post.script) : ''
