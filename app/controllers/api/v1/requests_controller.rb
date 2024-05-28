@@ -26,7 +26,13 @@ class Api::V1::RequestsController < ApplicationController
 
   def create
     if current_user.role == "artist"
+
+      binding.pry
+
       request = @post.requests.new(user: current_user)
+
+      binding.pry
+      
       if request.save
         request.update(apply_status: :applied)
         render json: request, status: :created
