@@ -27,16 +27,22 @@ class Api::V1::RequestsController < ApplicationController
   def create
     if current_user.role == "artist"
       request = @post.requests.new(user: current_user)
+      if @post.audition_type == "online" && request.link.present?
+        unless request.link =~ Request::VALID_LINK_REGEX
+          return render json: { error: "Link is invalid" }, status: :unprocessable_entity
+        end
+      end
       if request.save
         request.update(apply_status: :applied)
         render json: request, status: :created
       else
-        render json: {error: request.errors.full_messages}, status: :unprocessable_entity
+        render json: { error: request.errors.full_messages }, status: :unprocessable_entity
       end
     else
-      render json: {error: "You are unauthorized for this action"}, status: :unauthorized
+      render json: { error: "You are unauthorized for this action" }, status: :unauthorized
     end
   end
+
 
   def filter_shortlisted
     user = current_user
