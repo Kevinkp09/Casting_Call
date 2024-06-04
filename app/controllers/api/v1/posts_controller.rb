@@ -22,6 +22,7 @@ class Api::V1::PostsController < ApplicationController
           height: post.height,
           date: post.date,
           time: post.time,
+          language: post.language,
           project_type: post.project_type,
           google_link: post.google_link.present? ?  post.google_link : "N/A",
           approval_status: approval_status,
@@ -79,6 +80,7 @@ class Api::V1::PostsController < ApplicationController
           project_type: post.project_type,
           google_link: post.google_link,
           time: post.time,
+          language: post.language,
           script: post.script.attached? ? url_for(post.script) : ''
         }
       end
@@ -125,7 +127,7 @@ class Api::V1::PostsController < ApplicationController
 
   private
   def post_params
-    params.require(:post).permit(:title, :age, :location, :description, :role, :category, :audition_type,:skin_color, :weight, :height, :script, :date, :time, :project_type, :google_link)
+    params.require(:post).permit(:title, :age, :location, :language, :description, :role, :category, :audition_type,:skin_color, :weight, :height, :script, :date, :time, :project_type, :google_link)
   end
 
   def set_post
