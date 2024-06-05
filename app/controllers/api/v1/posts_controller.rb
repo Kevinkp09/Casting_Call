@@ -54,6 +54,7 @@ class Api::V1::PostsController < ApplicationController
           gender: r.user.gender,
           status: r.status,
           email: r.user.email,
+          profile_photo: r.user.profile_photo.attached? ? url_for(r.user.profile_photo) : "N/A"
         }
     end
     requests = requests.take(package.requests_limit) unless package.requests_limit.nil?
