@@ -299,7 +299,8 @@ class Api::V1::UsersController < ApplicationController
         birth_date: user.birth_date,
         current_location: user.current_location,
         profile_photo: user.profile_photo.attached? ? url_for(user.profile_photo) : '',
-        images: images
+        mobile_no: user.mobile_no,
+        images: images,
 
       }, works: works_data
     }, status: :ok
@@ -356,46 +357,6 @@ class Api::V1::UsersController < ApplicationController
       render json: images, status: :ok
     else
       render json: { message: "No images found" }, status: :not_found
-    end
-  end
-
-  def add_videos
-    user = current_user
-    if params[:user][:videos].present?
-      user.videos.attach(params[:user][:videos])
-      videos_details = user.videos.map do |video|
-        {
-          id: video.id,
-          filename: video.filename.to_s,
-        }
-      end
-      render json: {message: "Video added successfully", videos: videos_details}
-    else
-      render json: {error: "No videos provided"}, status: :not_found
-    end
-  end
-
-  def show_videos
-    user = current_user
-    if user.videos.attached?
-      videos = user.videos.map do |video|
-        {
-          url: url_for(video),
-          id: video.id
-        }
-      end
-      render json: videos, status: :ok
-    else
-      render json: { message: "No videos found" }, status: :not_found
-    end
-  end
-
-  def delete_video
-    @video = ActiveStorage::Attachment.find(params[:id])
-    if @video.purge
-      render json: {message: "Image deleted successfully"}, status: :ok
-    else
-      render json: {error: @video.errors.full_messages}, status: :unprocessable_entity
     end
   end
 

@@ -8,6 +8,7 @@ class Api::V1::WorksController < ApplicationController
         project_name: work.project_name,
         artist_role: work.artist_role,
         year: work.year,
+        project_type: work.project_type,
         youtube_link: work.youtube_link,
       }
     end

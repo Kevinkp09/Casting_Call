@@ -11,7 +11,6 @@ class User < ApplicationRecord
          VALID_MOBILE_REGEX = /\A\d{10}\z/
   has_one_attached :profile_photo
   has_many_attached :images
-  has_many_attached :videos
   belongs_to :package, class_name: "Package", foreign_key: "package_id", optional: true
   has_many :works
   has_many :payments, foreign_key: 'agency_id'
