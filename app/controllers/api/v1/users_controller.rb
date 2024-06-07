@@ -363,7 +363,7 @@ class Api::V1::UsersController < ApplicationController
   private
 
   def user_params
-    params.require(:user).permit(:email, :password, :username, :mobile_no, :role, :otp, :posts_count, :otp_generated_time, :gender, :birth_date, :is_agency, :country, :city, :state, :language, :agency_name,:otp_verified, :account_no, :branch_name, :pan_no, :gst_no, images: [], videos: [] )
+    params.require(:user).permit(:email, :password, :username, :mobile_no, :role, :otp, :posts_count, :otp_generated_time, :gender, :birth_date, :is_agency, :country, :city, :state, :language, :agency_name,:otp_verified, :account_no, :branch_name, :pan_no, :gst_no, images: [] )
   end
 
   def personal_params
