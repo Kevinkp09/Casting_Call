@@ -54,6 +54,7 @@ class Api::V1::PostsController < ApplicationController
           gender: r.user.gender,
           status: r.status,
           email: r.user.email,
+          link: r.link.present? ? r.link : "N/A",
           profile_photo: r.user.profile_photo.attached? ? url_for(r.user.profile_photo) : "N/A"
         }
     end
