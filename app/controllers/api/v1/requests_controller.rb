@@ -26,9 +26,9 @@ class Api::V1::RequestsController < ApplicationController
 
   def create
     if current_user.role == "artist"
-      request = @post.requests.new(user: current_user)
-      if @post.audition_type == "online" && request.link.present?
-        unless request.link =~ Request::VALID_LINK_REGEX
+      request = @post.requests.new(request.attributes.merge(user: current_user))
+      if @post.audition_type == "Online" && request.link.present?
+        unless request.link == Request::VALID_LINK_REGEX
           return render json: { error: "Link is invalid" }, status: :unprocessable_entity
         end
       end
