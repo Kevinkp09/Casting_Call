@@ -27,6 +27,7 @@ class Api::V1::PostsController < ApplicationController
           google_link: post.google_link.present? ?  post.google_link : "N/A",
           approval_status: approval_status,
           apply_status: request_status,
+          created_at: post.created_at,
           script: post.script.attached? ? url_for(post.script) : ''
         }
       end
@@ -83,6 +84,7 @@ class Api::V1::PostsController < ApplicationController
           google_link: post.google_link,
           time: post.time,
           language: post.language,
+          created_at: post.created_at,
           script: post.script.attached? ? url_for(post.script) : ''
         }
       end
