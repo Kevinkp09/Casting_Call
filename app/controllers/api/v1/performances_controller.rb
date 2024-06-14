@@ -3,7 +3,7 @@ class Api::V1::PerformancesController < ApplicationController
 
   def index
     user = current_user
-    performances = user.performances 
+    performances = user.performances
     performance_details = performances.map do |performance|
       {
         id: performance.id,
@@ -15,11 +15,12 @@ class Api::V1::PerformancesController < ApplicationController
   end
 
   def create
-    performance = Performance.new(performance_params)
+    user = current_user
+    performance = user.performances.new(performance_params)
     if performance.save
-      render json: {message: "Link added successfully"}, status: :created
+      render json: { message: "Link added successfully" }, status: :created
     else
-      render json: {error: performance.errors.full_messages}, status: :unprocessable_entity
+      render json: { error: performance.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
