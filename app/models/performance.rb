@@ -1,3 +1,3 @@
 class Performance < ApplicationRecord
-  belongs_to :work, foreign_key: "work_id", optional: true
+  belongs_to :user, foreign_key: true 
 end

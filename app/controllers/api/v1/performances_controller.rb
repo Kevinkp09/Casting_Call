@@ -3,7 +3,7 @@ class Api::V1::PerformancesController < ApplicationController
 
   def index
     user = current_user
-    performances = user.works.includes(:performances).flat_map(&:performances)
+    performances = user.performances 
     performance_details = performances.map do |performance|
       {
         id: performance.id,
