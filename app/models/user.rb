@@ -13,7 +13,7 @@ class User < ApplicationRecord
   has_many_attached :images
   belongs_to :package, class_name: "Package", foreign_key: "package_id", optional: true
   has_many :works
-  has_many :performances, dependent: destroy
+  has_many :performances, dependent: :destroy
   has_many :payments, foreign_key: 'agency_id'
   has_many :requests
   has_many :posts, through: :requests
