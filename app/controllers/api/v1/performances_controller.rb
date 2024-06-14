@@ -18,7 +18,7 @@ class Api::V1::PerformancesController < ApplicationController
     user = current_user
     performance = user.performances.new(performance_params)
     if performance.save
-      render json: { message: "Link added successfully" }, status: :created
+      render json: { message: "Link added successfully", video_link: performance.video_link, audition_link: performance.audition_link }, status: :created
     else
       render json: { error: performance.errors.full_messages }, status: :unprocessable_entity
     end
@@ -26,7 +26,7 @@ class Api::V1::PerformancesController < ApplicationController
 
   def update
     if @performance.update(performance_params)
-      render json: {message: "Link updated successfully"}, status: :ok
+      render json: {message: "Link updated successfully", video_link: @performance.video_link, audition_link: @performance.audition_link }, status: :ok
     else
       render json: {error: @performance.errors.full_messages}, status: :unprocessable_entity
     end
