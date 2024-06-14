@@ -1,5 +1,5 @@
-class Api::V1::PerformanceController < ApplicationController
-  before_action :set_performance, only: [:update, :destory]
+class Api::V1::PerformancesController < ApplicationController
+  before_action :set_performance, only: [:update, :destroy]
 
   def index
     user = current_user
@@ -8,7 +8,7 @@ class Api::V1::PerformanceController < ApplicationController
       {
         id: performance.id,
         video_link: performance.video_link,
-        audition_link: performance.audition_link 
+        audition_link: performance.audition_link
       }
     end
     render json: { performances: performance_details }, status: :ok
