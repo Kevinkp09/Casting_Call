@@ -51,6 +51,7 @@ Rails.application.routes.draw do
           get :filter_shortlisted, on: :collection
        end
        resources :packages
+       resources :performances
        resources :payments do
          post :callback, on: :collection
        end
