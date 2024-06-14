@@ -8,7 +8,7 @@ class Api::V1::PerformanceController < ApplicationController
       {
         id: performance.id,
         video_link: performance.video_link,
-        youtube_link: performance.youtube_link
+        audition_link: performance.audition_link 
       }
     end
     render json: { performances: performance_details }, status: :ok
