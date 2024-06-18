@@ -1,6 +1,6 @@
 class Post < ApplicationRecord
   has_one_attached :script
-  has_many :requests
+  has_many :requests, dependent: :destroy 
   has_many :users, through: :requests
   belongs_to :agency, class_name: "User", foreign_key: "agency_id"
   enum category: {artist: 0, dancer: 1, singer: 2}
