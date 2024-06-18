@@ -159,6 +159,7 @@ class Api::V1::UsersController < ApplicationController
           email: agency.email,
           package_name: package&.name || 'No package',
           mobile_no: agency.mobile_no,
+          payment_date: agency_payment&.created_at || 'N/A',
           payment_id: agency_payment&.razorpay_payment_id || 'N/A'
         }
       end
@@ -270,6 +271,7 @@ class Api::V1::UsersController < ApplicationController
   def view_profile
     user = User.find(params[:user_id])
     works = user.works
+    performances = user.performances
     images = user.images.map do |image|
       {
         url: url_for(image),
@@ -285,6 +287,14 @@ class Api::V1::UsersController < ApplicationController
          artist_role: work.artist_role,
       }
     end
+
+    performances_data = performances.map do |performance|
+      {
+        id: performance.id,
+        video_link: performance.video_link.presence || "N/A",
+        audition_link: performance.audition_link.presence || "N/A"
+      }
+    end
     render json:{
       user: {
         username: user.username,
@@ -297,12 +307,12 @@ class Api::V1::UsersController < ApplicationController
         category: user.category,
         language: user.language,
         birth_date: user.birth_date,
-        current_location: user.current_location,
+        city: user.city,
         profile_photo: user.profile_photo.attached? ? url_for(user.profile_photo) : '',
         mobile_no: user.mobile_no,
         images: images,
 
-      }, works: works_data
+      }, works: works_data, performances: performances_data
     }, status: :ok
   end
 
