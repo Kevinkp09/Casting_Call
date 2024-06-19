@@ -1,16 +1,27 @@
 class Api::V1::PerformancesController < ApplicationController
   before_action :set_performance, only: [:update, :destroy]
 
-  def index
+  def show_video
     user = current_user
     performances = user.performances
     performance_details = performances.map do |performance|
       {
         id: performance.id,
         video_link: performance.video_link,
-        audition_link: performance.audition_link
       }
     end
+    render json: { performances: performance_details }, status: :ok
+  end
+
+  def show_audition
+    user = current_user
+      performances = user.performances
+      performance_details = performances.map do |performance|
+        {
+          id: performance.id,
+          video_link: performance.video_link,
+        }
+      end
     render json: { performances: performance_details }, status: :ok
   end
 
