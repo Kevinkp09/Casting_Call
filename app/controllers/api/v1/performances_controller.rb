@@ -19,7 +19,7 @@ class Api::V1::PerformancesController < ApplicationController
       performance_details = performances.map do |performance|
         {
           id: performance.id,
-          video_link: performance.video_link,
+          video_link: performance.audition_link,
         }
       end
     render json: { performances: performance_details }, status: :ok
